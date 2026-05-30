@@ -44,3 +44,21 @@ npm run commit
 ```
 
 Nota: instala dependencias en `web/` y ejecuta `npm run prepare` para activar Husky antes de usar los hooks.
+
+python -m unittest discover -v
+```
+
+Integración continua
+- Se agregó un workflow de GitHub Actions en `.github/workflows/ci.yml` que ejecuta los tests en pushes y PRs.
+
+Contribuir
+- Abre un issue o PR en la rama `001-pokemon-compiler-language` para propuestas o fixes.
+
+Limitaciones y próximos pasos
+- Actualmente implementadas: análisis léxico, sintáctico y semántico con reglas temáticas.
+- Pendiente: representación intermedia (IR) y generación de código objeto.
+
+Contacto
+- Autor: enzogabALF
+- Autor: Jeunex2004 (Jeuel Evin Linder)
+- Autor:
