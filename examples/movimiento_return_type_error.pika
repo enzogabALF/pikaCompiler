@@ -1,0 +1,4 @@
+MOVIMIENTO MAL_RET() RETORNA SuperBall {
+    // SuperBall maps to float; returning a string must error
+    RETORNA "no es float";
+}

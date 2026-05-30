@@ -1,0 +1,6 @@
+PUEBLO_NATAL() {
+    CAPTURA idx EN PokeBall CON 0;
+    idx = 100;
+    EQUIPO arr DE PokeBall CAPACIDAD 3;
+    arr[idx] = 1;
+}

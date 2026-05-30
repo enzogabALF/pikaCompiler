@@ -1,0 +1,27 @@
+PUEBLO_NATAL() {
+    DICE_PROF_OAK("--- INICIANDO AVENTURA ---");
+
+    CAPTURA mi_nivel EN PokeBall CON 0;
+    mi_nivel = OAK_PREGUNTA("¿Qué nivel tiene tu Pokémon inicial?");
+
+    EQUIPO mis_niveles DE PokeBall CAPACIDAD 3;
+    mis_niveles[0] = mi_nivel;
+    mis_niveles[1] = mi_nivel + 5;
+    mis_niveles[2] = mi_nivel + 10;
+
+    DICE_PROF_OAK("El nivel del segundo Pokémon es:");
+    DICE_PROF_OAK(mis_niveles[1]);
+
+    CAPTURA ps_combate EN PokeBall CON 100;
+    RADAR radar_centro_medico APUNTA_A PokeBall;
+
+    radar_centro_medico = UBICACION_DE(ps_combate);
+
+    SI_ENTRENADOR_DESAFIA (ps_combate < 50) {
+        DICE_PROF_OAK("¡Alerta! PS bajos. Usando radar médico para curar...");
+        MIRAR_RADAR(radar_centro_medico) = 100;
+    }
+
+    DICE_PROF_OAK("PS actuales del Pokémon:");
+    DICE_PROF_OAK(ps_combate);
+}

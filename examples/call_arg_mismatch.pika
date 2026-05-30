@@ -1,0 +1,8 @@
+MOVIMIENTO A(x: PokeBall) RETORNA PokeBall {
+    RETORNA x;
+}
+
+PUEBLO_NATAL() {
+    CAPTURA r EN PokeBall CON 0;
+    r = A(1, 2);
+}

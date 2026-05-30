@@ -1,0 +1,2 @@
+// RETORNA fuera de función -> error
+RETORNA 1;

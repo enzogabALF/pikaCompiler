@@ -1,0 +1,4 @@
+PUEBLO_NATAL() {
+    EQUIPO arr DE PokeBall CAPACIDAD 3;
+    arr[0] = "hola";
+}

@@ -1,0 +1,5 @@
+MOVIMIENTO SINRET() RETORNA PokeBall {
+    CAPTURA x EN PokeBall CON 0;
+    x = 1;
+    // no RETORNA -> should warn
+}

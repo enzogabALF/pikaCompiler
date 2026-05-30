@@ -1,0 +1,5 @@
+MOVIMIENTO CURAR() RETORNA PokeBall {
+    CAPTURA cura EN PokeBall CON 0;
+    cura = 5;
+    RETORNA cura;
+}
