@@ -1,50 +1,36 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# pikaCompiler Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Compiler Pedagogy First
+El compilador existe como herramienta académica para aprender la construcción de compiladores. Cada decisión de diseño debe priorizar claridad, trazabilidad y facilidad de explicación por encima de la optimización prematura o la complejidad innecesaria.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Lenguaje Propio Con Identidad Temática
+El lenguaje debe ser propio, consistente y fácil de leer, con una identidad inspirada en Pokémon solo como referencia estética y didáctica. No se deben copiar nombres, reglas o material protegido de forma literal; la temática debe servir para motivar el aprendizaje, no para ocultar ambigüedad técnica.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Arquitectura En Cinco Fases
+La arquitectura del compilador debe modelar explícitamente las cinco fases clásicas: análisis léxico, análisis sintáctico, análisis semántico, generación y optimización de código intermedio, y generación de código objeto. La implementación debe respetar el orden conceptual de esas fases y mantener separadas sus responsabilidades.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Mínimo Entregable De Tres Fases
+Como base indispensable del proyecto, deben estar implementadas al menos tres fases completas y conectadas de extremo a extremo. La prioridad inicial es lexical, sintáctica y semántica; las fases de código intermedio y código objeto pueden incorporarse después como evolución natural del compilador.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Diagnóstico Claro Y Verificable
+Cada fase debe producir errores y trazas comprensibles, con información suficiente para ubicar el problema y explicar por qué ocurrió. Los mensajes deben ser deterministas, consistentes y útiles para depuración académica.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Alcance Y Calidad
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+El proyecto debe mantener una separación limpia entre lexer, parser, analizador semántico, generador de IR y backend. Cada módulo debe ser testeable de forma aislada y también verificable en cadena. Las estructuras centrales del lenguaje, como tokens, AST, tabla de símbolos y tipos, deben definirse con estabilidad suficiente para evitar cambios arbitrarios entre fases.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+La implementación debe favorecer ejemplos pequeños, casos de prueba reproducibles y documentación de uso orientada al aprendizaje. Cualquier optimización o extensión del lenguaje debe justificarse por valor pedagógico o por necesidad técnica del compilador.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Flujo De Desarrollo
+
+Toda nueva funcionalidad debe especificar primero qué fase del compilador afecta y qué artefacto produce o consume. Antes de ampliar el alcance, el equipo debe validar que la fase anterior conserva su comportamiento esperado. Las pruebas mínimas deben cubrir entrada válida, entrada inválida y un caso representativo por fase implementada.
+
+Cuando el proyecto alcance más de tres fases, la integración entre fases será obligatoria en la validación. La meta de largo plazo es completar las cinco fases sin romper el contrato ya establecido por las tres primeras.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Esta constitución tiene prioridad sobre guías, tareas y decisiones puntuales del proyecto. Cualquier cambio que altere la arquitectura de fases, el alcance del lenguaje o el mínimo de implementación debe actualizar este documento primero y dejar una explicación clara del motivo.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-05-30 | **Last Amended**: 2026-05-30
