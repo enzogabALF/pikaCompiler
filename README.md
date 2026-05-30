@@ -42,5 +42,5 @@ Limitaciones y próximos pasos
 
 Contacto
 - Autor: enzogabALF
-- Autor:
+- Autor: Jeunex2004 (Jeuel Evin Linder)
 - Autor:
