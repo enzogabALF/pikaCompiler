@@ -1,0 +1,6 @@
+# Ensure consistent LF line endings
+* text=auto eol=lf
+
+# Treat JSON and Markdown as text
+*.md text
+*.json text

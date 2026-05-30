@@ -1,0 +1,8 @@
+{
+  "name": "pikaCompiler-root",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "commit": "node ./scripts/commit-wrapper.js"
+  }
+}

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Delegar validación de mensaje al subproyecto web (commitlint)
+cd "$(dirname "$0")/.." || exit 1
+cd web || exit 1
+npx --no-install --no -- commitlint --edit "$1"

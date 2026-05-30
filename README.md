@@ -1,46 +1,46 @@
-# pikaCompiler
+# pikaCompiler (TypeScript / Web)
 
-Compilador educativo en Python para un lenguaje temático inspirado en Pokémon. Diseñado para enseñar las fases de un compilador (léxico, sintáctico y semántico) con ejemplos y pruebas automáticas.
+Compilador educativo migrado a TypeScript y preparado para uso en la web.
 
-**Requisitos**
-- Python 3.10+
+Estructura relevante:
+- `web/` — aplicación Vite + React + TypeScript con Monaco Editor y un WebWorker que contiene el core del compilador (Chevrotain).
+- `examples/` — programas de ejemplo en PokeLang (archivos `.pika`).
+- `CONTRIBUTING.md` — guía de contribución y versionado.
 
-**Estructura clave**
-- `src/lexer.py` — tokenizador
-- `src/parser.py` — parser recursivo-descendente y construcción de AST
-- `src/semantics.py` — analizador semántico (scope, tipos, reglas)
-- `src/parser_runner.py`, `src/semantics_runner.py`, `src/compile.py` — runners de línea de comandos
-- `examples/` — programas de ejemplo
-- `tests/` — pruebas unitarias ejecutadas con `unittest`
+Arrancar localmente (desde la raíz):
 
-Uso rápido
-
-- Ejecutar análisis semántico sobre un ejemplo:
 ```bash
-python src/semantics_runner.py examples/pueblo.pika
+cd web
+npm ci
+npm run dev
 ```
 
-- Imprimir AST de un ejemplo:
-```bash
-python src/parser_runner.py examples/pueblo.pika --ast
-```
+Descripción rápida
+- El editor (Monaco) envía el código al WebWorker `web/src/worker/compiler.worker.ts` que tokeniza y parsea con `chevrotain`.
+- Si hay errores, el worker devuelve diagnósticos; si el parseo es correcto, devuelve `Parsed OK` (en próximas iteraciones se añadirá AST y ejecución).
 
-- Ejecutar la suite de tests localmente:
-```bash
-python -m unittest discover -v
-```
+Control de versiones
+- Sigue SemVer. Ver `CONTRIBUTING.md` para el flujo de branching y cómo publicar versiones del subproyecto `web/`.
 
-Integración continua
-- Se agregó un workflow de GitHub Actions en `.github/workflows/ci.yml` que ejecuta los tests en pushes y PRs.
+CI
+- El workflow `.github/workflows/ci.yml` ejecuta las pruebas del subproyecto `web/` en cada PR y push.
 
 Contribuir
-- Abre un issue o PR en la rama `001-pokemon-compiler-language` para propuestas o fixes.
+- Lee `CONTRIBUTING.md` y abre PRs desde ramas `feature/*` o `fix/*` contra `main`.
 
-Limitaciones y próximos pasos
-- Actualmente implementadas: análisis léxico, sintáctico y semántico con reglas temáticas.
-- Pendiente: representación intermedia (IR) y generación de código objeto.
+Conveniencia — commits convencionales
+- Desde la raíz puedes lanzar Commitizen (guía interactiva para Conventional Commits):
 
-Contacto
-- Autor: enzogabALF
-- Autor:
-- Autor:
+```bash
+./scripts/commit.sh   # POSIX
+./scripts/commit.ps1 # PowerShell
+```
+
+- Alternativamente, desde `web/`:
+
+```bash
+cd web
+npm run commit
+```
+
+Nota: instala dependencias en `web/` y ejecuta `npm run prepare` para activar Husky antes de usar los hooks.
