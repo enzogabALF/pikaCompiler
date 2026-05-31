@@ -15,7 +15,14 @@ Expr ::= ... (operadores aritméticos y comparaciones, llamadas, identificadores
 5) Tipos y mapeo
 # Lenguaje PikaCompiler — Sintaxis y Semántica
 
-Resumen: lenguaje educativo inspirado en Pokemon. Fases implementadas: léxico, sintáctico y semántico (básico).
+Resumen: lenguaje educativo inspirado en Pokemon. Objetivo del compilador: 5 fases conectadas end-to-end: léxica, sintáctica, semántica, IR/optimización y generación de código.
+
+Fases del compilador
+- Fase 1: análisis léxico.
+- Fase 2: análisis sintáctico.
+- Fase 3: análisis semántico.
+- Fase 4: representación intermedia y optimización.
+- Fase 5: generación de código objeto o backend de ejecución.
 
 1) Elementos léxicos
 - Identificadores: secuencia de letras, dígitos y _ que no comienzan con dígito. Token `IDENT`.
@@ -101,7 +108,8 @@ Expr ::= ... (operadores aritméticos y comparaciones, llamadas, identificadores
 9) Limitaciones actuales
 - El parser aún no soporta parámetros de función; por tanto no hay comprobación de firma/params.
 - No hay inferencia de tipos compleja ni sistema de tipos estructural.
-- No se generan ubicaciones de memoria ni código objeto aún.
+- La Fase 4 (IR/optimización) todavía no existe en el worker actual.
+- La Fase 5 (generación de código objeto o backend de ejecución) todavía no existe en el worker actual.
 
 10) Cómo probar
 Ejecutar:
@@ -112,4 +120,6 @@ python src/semantics_runner.py examples/pueblo.pika
 11) Próximos pasos recomendados
 - Añadir parsing de parámetros y tipos de retorno en `FunctionDecl`.
 - Implementar comprobación de firmas y compatibilidad argumental.
+- Diseñar y generar una IR estable para la Fase 4.
+- Añadir un backend mínimo de salida para la Fase 5.
 - Añadir pruebas unitarias en `tests/` para casos positivos y negativos.

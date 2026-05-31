@@ -17,7 +17,8 @@ npm run dev
 
 Descripción rápida
 - El editor (Monaco) envía el código al WebWorker `web/src/worker/compiler.worker.ts` que tokeniza y parsea con `chevrotain`.
-- Si hay errores, el worker devuelve diagnósticos; si el parseo es correcto, devuelve `Parsed OK` (en próximas iteraciones se añadirá AST y ejecución).
+- Si hay errores, el worker devuelve diagnósticos; si el parseo es correcto, devuelve `Parsed OK`.
+- El objetivo del lenguaje es un compilador en 5 fases: léxico, sintáctico, semántico, IR/optimización y generación de código.
 
 Control de versiones
 - Sigue SemVer. Ver `CONTRIBUTING.md` para el flujo de branching y cómo publicar versiones del subproyecto `web/`.
@@ -56,7 +57,7 @@ Contribuir
 
 Limitaciones y próximos pasos
 - Actualmente implementadas: análisis léxico, sintáctico y semántico con reglas temáticas.
-- Pendiente: representación intermedia (IR) y generación de código objeto.
+- Pendiente: representación intermedia (IR), optimización y generación de código objeto.
 
 Contacto
 - Autor: enzogabALF
