@@ -5,6 +5,8 @@
 # Build outputs
 /dist
 /web/dist
+.turbo/
+/web/.turbo/
 
 # Logs
 npm-debug.log*
