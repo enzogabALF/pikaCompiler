@@ -54,10 +54,12 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,js,jsx,json,css,md}": [
+    "src/**/*.{ts,tsx,js,jsx}": [
       "pnpm run format",
-      "pnpm run lint",
-      "git add"
+      "pnpm run lint"
+    ],
+    "src/**/*.{json,css,md}": [
+      "pnpm run format"
     ]
   }
 }

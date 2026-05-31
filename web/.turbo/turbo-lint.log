@@ -1,0 +1,76 @@
+ WARN  Unsupported engine: wanted: {"node":">=18 <19"} (current: {"node":"v22.17.0","pnpm":"10.15.0"})
+
+> pika-compiler-web@0.1.0 lint C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web
+> eslint "src/**/*.{ts,tsx,js,jsx}"
+
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\App.tsx
+   4:6   warning  'Marker' is defined but never used                                   @typescript-eslint/no-unused-vars
+  12:16  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  20:39  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  25:15  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  28:3   warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  41:22  warning  'v' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  41:25  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  42:29  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+  43:34  warning  Missing return type on function                                      @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\compiler\ast.test.ts
+  6:1  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\compiler\ast.ts
+  155:1  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\compiler\lexer.test.ts
+  4:1  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\compiler\lexer.ts
+  241:8  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\compiler\parser.ts
+   86:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+   91:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  119:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  120:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  121:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  122:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  134:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  135:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  136:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  137:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  138:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  139:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  140:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  141:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  142:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  223:15  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  223:53  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  236:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  250:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  260:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  273:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  274:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  275:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  276:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  277:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  278:13  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  287:17  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  287:49  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  295:17  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  295:49  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  301:15  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  301:53  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  309:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  310:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  311:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  313:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  319:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  321:11  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  326:19  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+  339:19  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+C:\Users\Usuario\OneDrive\Desktop\Compilador y lenguaje\pikaCompiler\web\src\worker\compiler.worker.ts
+  5:17  warning  Missing return type on function  @typescript-eslint/explicit-function-return-type
+
+✖ 54 problems (0 errors, 54 warnings)
+
