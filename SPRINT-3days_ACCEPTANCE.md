@@ -7,8 +7,8 @@ Notas generales:
 Day 1 — Onboarding y núcleo inicial
 
 1) Day1: Dev env & onboarding (All)
-- Criterio: `web/` instala dependencias sin errores (`npm ci`) y Husky se activa con `npm run prepare`.
-- Criterio: README actualizado con pasos de arranque y scripts de commits; equipo puede ejecutar `npm run commit` desde la raíz.
+- Criterio: `web/` instala dependencias sin errores con `pnpm install` y Husky se activa con `pnpm --dir web run prepare`.
+- Criterio: README actualizado con pasos de arranque y scripts de commits; equipo puede ejecutar `pnpm --dir web run commit` desde la raíz.
 
 2) Day1: Lexer + unit tests (A)
 - Criterio: Implementación inicial del lexer en `web/src/worker/compiler.worker.ts` o `web/src/compiler/lexer.ts`.
@@ -63,7 +63,7 @@ Day 3 — Generación/ejecución y entrega
 
 Criterios transversales (calidad)
 - Todos los cambios tienen pruebas unitarias o E2E relevantes.
-- Código con `npm run lint` sin errores y `npm run format` aplicado.
-- Commits siguen Conventional Commits (usar `npm run commit` o `commitizen`).
+- Código con `pnpm run lint` sin errores y `pnpm run format` aplicado.
+- Commits siguen Conventional Commits (usar `pnpm --dir web run commit` o `commitizen`).
 
 *** Fin de criterios de aceptación ***

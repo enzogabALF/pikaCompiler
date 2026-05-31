@@ -1,65 +1,83 @@
-# pikaCompiler (TypeScript / Web)
+# pikaCompiler
 
-Compilador educativo migrado a TypeScript y preparado para uso en la web.
+Compilador educativo con temática Pokémon, organizado en 5 fases: léxico, sintáctico, semántico, IR/optimización y generación de código.
 
-Estructura relevante:
-- `web/` — aplicación Vite + React + TypeScript con Monaco Editor y un WebWorker que contiene el core del compilador (Chevrotain).
-- `examples/` — programas de ejemplo en PokeLang (archivos `.pika`).
-- `CONTRIBUTING.md` — guía de contribución y versionado.
+## Estado actual
 
-Arrancar localmente (desde la raíz):
+Implementado hoy:
+- Análisis léxico básico en el worker del frontend.
+- Análisis sintáctico básico con Chevrotain.
+- Reglas semánticas temáticas iniciales documentadas en [docs/syntax_and_semantics.md](docs/syntax_and_semantics.md).
+- Flujo de desarrollo con `pnpm`, `turbo`, `ESLint`, `Prettier` y `Husky`.
 
-```bash
-cd web
-npm ci
-npm run dev
-```
+Pendiente:
+- CST a AST.
+- Análisis semántico completo.
+- IR y optimización.
+- Generación de código o intérprete.
 
-Descripción rápida
-- El editor (Monaco) envía el código al WebWorker `web/src/worker/compiler.worker.ts` que tokeniza y parsea con `chevrotain`.
-- Si hay errores, el worker devuelve diagnósticos; si el parseo es correcto, devuelve `Parsed OK`.
-- El objetivo del lenguaje es un compilador en 5 fases: léxico, sintáctico, semántico, IR/optimización y generación de código.
+## Estructura relevante
 
-Control de versiones
-- Sigue SemVer. Ver `CONTRIBUTING.md` para el flujo de branching y cómo publicar versiones del subproyecto `web/`.
+- `web/` — app Vite + React + TypeScript con Monaco Editor y el WebWorker del compilador.
+- `examples/` — ejemplos `.pika` para pruebas y demostraciones.
+- `docs/` — especificación de sintaxis, semántica e instrucciones del proyecto.
+- `INSTALLATION.md` — guía para clonar, instalar y retomar el trabajo.
+- `CONTRIBUTING.md` — flujo de contribución, versionado y releases.
 
-CI
-- El workflow `.github/workflows/ci.yml` ejecuta las pruebas del subproyecto `web/` en cada PR y push.
-
-Contribuir
-- Lee `CONTRIBUTING.md` y abre PRs desde ramas `feature/*` o `fix/*` contra `main`.
-
-Conveniencia — commits convencionales
-- Desde la raíz puedes lanzar Commitizen (guía interactiva para Conventional Commits):
+## Arranque rápido
 
 ```bash
-./scripts/commit.sh   # POSIX
-./scripts/commit.ps1 # PowerShell
+pnpm install
+pnpm dev
 ```
 
-- Alternativamente, desde `web/`:
+## Formatos y calidad
+
+El repositorio usa estos formatos y verificaciones:
+
+- Formato de código: `Prettier`.
+- Lint: `ESLint`.
+- Hooks locales: `Husky` + `lint-staged`.
+- Commits: Conventional Commits con `Commitizen`.
+- Orquestación del workspace: `turbo`.
+
+Comandos útiles desde la raíz:
 
 ```bash
-cd web
-npm run commit
+pnpm lint
+pnpm test
+pnpm build
+pnpm format
 ```
 
-Nota: instala dependencias en `web/` y ejecuta `npm run prepare` para activar Husky antes de usar los hooks.
+## Commits convencionales
 
-python -m unittest discover -v
+Desde la raíz:
+
+```bash
+./scripts/commit.sh
+./scripts/commit.ps1
 ```
 
-Integración continua
-- Se agregó un workflow de GitHub Actions en `.github/workflows/ci.yml` que ejecuta los tests en pushes y PRs.
+Desde `web/`:
 
-Contribuir
-- Abre un issue o PR en la rama `001-pokemon-compiler-language` para propuestas o fixes.
+```bash
+pnpm --dir web run commit
+```
 
-Limitaciones y próximos pasos
-- Actualmente implementadas: análisis léxico, sintáctico y semántico con reglas temáticas.
-- Pendiente: representación intermedia (IR), optimización y generación de código objeto.
+## CI
 
-Contacto
-- Autor: enzogabALF
-- Autor: Jeunex2004 (Jeuel Evin Linder)
-- Autor:
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml) instala con `pnpm` y ejecuta `lint`, `test` y `build`.
+- [`.github/workflows/release.yml`](.github/workflows/release.yml) crea releases desde tags `v*.*.*`.
+- [`.github/workflows/semantic-release.yml`](.github/workflows/semantic-release.yml) publica releases automáticos.
+
+## Contribuir
+
+- Sigue la rama de trabajo `001-pokemon-compiler-language`.
+- Revisa [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir PRs.
+- Usa [`INSTALLATION.md`](INSTALLATION.md) para preparar un entorno nuevo o retomar trabajo.
+
+## Referencia técnica
+
+- La gramática y la semántica del lenguaje están documentadas en [docs/syntax_and_semantics.md](docs/syntax_and_semantics.md).
+- El worker principal vive en [web/src/worker/compiler.worker.ts](web/src/worker/compiler.worker.ts).

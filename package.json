@@ -2,7 +2,19 @@
   "name": "pikaCompiler-root",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.15.0",
   "scripts": {
+    "dev": "turbo run dev --filter=web",
+    "build": "turbo run build --filter=web",
+    "test": "turbo run test --filter=web",
+    "lint": "turbo run lint --filter=web",
+    "format": "turbo run format --filter=web",
     "commit": "node ./scripts/commit-wrapper.js"
+  },
+  "engines": {
+    "node": ">=18 <19"
+  },
+  "devDependencies": {
+    "turbo": "2.9.16"
   }
 }
