@@ -1,41 +1,43 @@
-import { PokeLexer } from '../compiler/lexer'
-import { parser } from '../compiler/parser'
-import { cstToAst } from '../compiler/ast'
+import { cstToAst } from '../compiler/ast';
+import { parser } from '../compiler/parser';
+import { tokenizePokeCode } from '../compiler/lexer';
 
 onmessage = (e) => {
-  const code = e.data.code || ''
-  const lexResult = PokeLexer.tokenize(code)
-  
+  const code = e.data.code || '';
+  const lexResult = tokenizePokeCode(code);
+
   if (lexResult.errors.length) {
     postMessage({
       type: 'errors',
-      errors: lexResult.errors.map(err => `Lexical error: [Line ${err.line}, Col ${err.column}] ${err.message}`)
-    })
-    return
+      errors: lexResult.errors.map(
+        (err) => `Lexical error: [Line ${err.line}, Col ${err.column}] ${err.message}`
+      ),
+    });
+    return;
   }
-  
-  parser.input = lexResult.tokens
-  const cst = parser.program()
-  
+
+  parser.input = lexResult.tokens;
+  const cst = parser.program();
+
   if (parser.errors.length) {
     postMessage({
       type: 'errors',
-      errors: parser.errors.map(err => `Syntax error: ${err.message}`)
-    })
-    return
+      errors: parser.errors.map((err) => `Syntax error: ${err.message}`),
+    });
+    return;
   }
-  
+
   try {
-    const ast = cstToAst(cst)
+    const ast = cstToAst(cst);
     postMessage({
       type: 'result',
       text: 'Parsed OK!\n\n--- AST GENERADO ---\n' + JSON.stringify(ast, null, 2),
-      ast
-    })
+      ast,
+    });
   } catch (err: any) {
     postMessage({
       type: 'errors',
-      errors: [`AST Translation Error: ${err.message}`]
-    })
+      errors: [`AST Translation Error: ${err.message}`],
+    });
   }
-}
+};

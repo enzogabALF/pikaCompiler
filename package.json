@@ -4,11 +4,11 @@
   "private": true,
   "packageManager": "pnpm@10.15.0",
   "scripts": {
-    "dev": "turbo run dev --filter=web",
-    "build": "turbo run build --filter=web",
-    "test": "turbo run test --filter=web",
-    "lint": "turbo run lint --filter=web",
-    "format": "turbo run format --filter=web",
+    "dev": "turbo run dev --filter=pika-compiler-web",
+    "build": "turbo run build --filter=pika-compiler-web",
+    "test": "turbo run test --filter=pika-compiler-web",
+    "lint": "turbo run lint --filter=pika-compiler-web",
+    "format": "turbo run format --filter=pika-compiler-web",
     "commit": "node ./scripts/commit-wrapper.js"
   },
   "engines": {

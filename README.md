@@ -7,11 +7,11 @@ Compilador educativo con temática Pokémon, organizado en 5 fases: léxico, sin
 Implementado hoy:
 - Análisis léxico básico en el worker del frontend.
 - Análisis sintáctico básico con Chevrotain.
+- Traducción CST a AST y salida estructurada del compilador.
 - Reglas semánticas temáticas iniciales documentadas en [docs/syntax_and_semantics.md](docs/syntax_and_semantics.md).
 - Flujo de desarrollo con `pnpm`, `turbo`, `ESLint`, `Prettier` y `Husky`.
 
 Pendiente:
-- CST a AST.
 - Análisis semántico completo.
 - IR y optimización.
 - Generación de código o intérprete.
@@ -29,6 +29,12 @@ Pendiente:
 ```bash
 pnpm install
 pnpm dev
+```
+
+Si prefieres abrir solo la app web directamente:
+
+```bash
+pnpm --dir web dev
 ```
 
 ## Formatos y calidad

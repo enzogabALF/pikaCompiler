@@ -1,118 +1,219 @@
-import { createToken, Lexer } from 'chevrotain'
+import { createToken, Lexer } from 'chevrotain';
 
-// Base identifier
-export const Identifier = createToken({ name: 'Identifier', pattern: /[A-Za-z_][A-Za-z0-9_]*/ })
+export const TokenNames = {
+  Identifier: 'Identifier',
+  Int: 'Int',
+  Float: 'Float',
+  String: 'String',
+  LineComment: 'LineComment',
+  BlockComment: 'BlockComment',
+  LParen: 'LParen',
+  RParen: 'RParen',
+  LBrace: 'LBrace',
+  RBrace: 'RBrace',
+  LBracket: 'LBracket',
+  RBracket: 'RBracket',
+  Comma: 'Comma',
+  Semicolon: 'Semicolon',
+  Colon: 'Colon',
+  Assign: 'Assign',
+  Plus: 'Plus',
+  Minus: 'Minus',
+  Mult: 'Mult',
+  Div: 'Div',
+  LessThan: 'LessThan',
+  GreaterThan: 'GreaterThan',
+  LessEqual: 'LessEqual',
+  GreaterEqual: 'GreaterEqual',
+  Equal: 'Equal',
+  NotEqual: 'NotEqual',
+  KeywordMovimiento: 'KeywordMovimiento',
+  KeywordPuebloNatal: 'KeywordPuebloNatal',
+  KeywordCaptura: 'KeywordCaptura',
+  KeywordEn: 'KeywordEn',
+  KeywordCon: 'KeywordCon',
+  KeywordEquipo: 'KeywordEquipo',
+  KeywordDe: 'KeywordDe',
+  KeywordCapacidad: 'KeywordCapacidad',
+  KeywordMochila: 'KeywordMochila',
+  KeywordRadar: 'KeywordRadar',
+  KeywordApuntaA: 'KeywordApuntaA',
+  KeywordSiEntrenadorDesafia: 'KeywordSiEntrenadorDesafia',
+  KeywordSino: 'KeywordSino',
+  KeywordMientrasTengaPs: 'KeywordMientrasTengaPs',
+  KeywordRetorna: 'KeywordRetorna',
+  KeywordPokeBall: 'KeywordPokeBall',
+  KeywordSuperBall: 'KeywordSuperBall',
+  KeywordUltraBall: 'KeywordUltraBall',
+  KeywordMasterBall: 'KeywordMasterBall',
+  SpecialMirarRadar: 'SpecialMirarRadar',
+  SpecialDevolverALaBall: 'SpecialDevolverALaBall',
+} as const;
 
-// Keywords (using longer_alt: Identifier to ensure they don't match partially)
-export const PuebloNatal = createToken({ name: 'PuebloNatal', pattern: /PUEBLO_NATAL/, longer_alt: Identifier })
-export const Movimiento = createToken({ name: 'Movimiento', pattern: /MOVIMIENTO/, longer_alt: Identifier })
-export const Captura = createToken({ name: 'Captura', pattern: /CAPTURA/, longer_alt: Identifier })
-export const En = createToken({ name: 'En', pattern: /EN/, longer_alt: Identifier })
-export const Con = createToken({ name: 'Con', pattern: /CON/, longer_alt: Identifier })
-export const Equipo = createToken({ name: 'Equipo', pattern: /EQUIPO/, longer_alt: Identifier })
-export const De = createToken({ name: 'De', pattern: /DE/, longer_alt: Identifier })
-export const Capacidad = createToken({ name: 'Capacidad', pattern: /CAPACIDAD/, longer_alt: Identifier })
-export const Mochila = createToken({ name: 'Mochila', pattern: /MOCHILA/, longer_alt: Identifier })
-export const Radar = createToken({ name: 'Radar', pattern: /RADAR/, longer_alt: Identifier })
-export const ApuntaA = createToken({ name: 'ApuntaA', pattern: /APUNTA_A/, longer_alt: Identifier })
-export const SiEntrenadorDesafia = createToken({ name: 'SiEntrenadorDesafia', pattern: /SI_ENTRENADOR_DESAFIA/, longer_alt: Identifier })
-export const Sino = createToken({ name: 'Sino', pattern: /SINO/, longer_alt: Identifier })
-export const MientrasTengaPs = createToken({ name: 'MientrasTengaPs', pattern: /MIENTRAS_TENGA_PS/, longer_alt: Identifier })
-export const Retorna = createToken({ name: 'Retorna', pattern: /RETORNA/, longer_alt: Identifier })
+export const WhiteSpace = createToken({
+  name: 'WhiteSpace',
+  pattern: /[ \t\n\r]+/,
+  group: Lexer.SKIPPED,
+});
+export const LineComment = createToken({
+  name: TokenNames.LineComment,
+  pattern: /\/\/[^\n\r]*/,
+  group: Lexer.SKIPPED,
+});
+export const BlockComment = createToken({
+  name: TokenNames.BlockComment,
+  pattern: /\/\*[\s\S]*?\*\//,
+  group: Lexer.SKIPPED,
+});
+export const Float = createToken({ name: TokenNames.Float, pattern: /\d+\.\d+/ });
+export const Int = createToken({ name: TokenNames.Int, pattern: /\d+/ });
+export const StringLiteral = createToken({ name: TokenNames.String, pattern: /"(?:[^"\\]|\\.)*"/ });
 
-// Type keywords
-export const PokeBall = createToken({ name: 'PokeBall', pattern: /PokeBall/, longer_alt: Identifier })
-export const SuperBall = createToken({ name: 'SuperBall', pattern: /SuperBall/, longer_alt: Identifier })
-export const UltraBall = createToken({ name: 'UltraBall', pattern: /UltraBall/, longer_alt: Identifier })
-export const MasterBall = createToken({ name: 'MasterBall', pattern: /MasterBall/, longer_alt: Identifier })
+export const KeywordMovimiento = createToken({
+  name: TokenNames.KeywordMovimiento,
+  pattern: /MOVIMIENTO\b/,
+});
+export const KeywordPuebloNatal = createToken({
+  name: TokenNames.KeywordPuebloNatal,
+  pattern: /PUEBLO_NATAL\b/,
+});
+export const KeywordCaptura = createToken({
+  name: TokenNames.KeywordCaptura,
+  pattern: /CAPTURA\b/,
+});
+export const KeywordEn = createToken({ name: TokenNames.KeywordEn, pattern: /EN\b/ });
+export const KeywordCon = createToken({ name: TokenNames.KeywordCon, pattern: /CON\b/ });
+export const KeywordEquipo = createToken({ name: TokenNames.KeywordEquipo, pattern: /EQUIPO\b/ });
+export const KeywordDe = createToken({ name: TokenNames.KeywordDe, pattern: /DE\b/ });
+export const KeywordCapacidad = createToken({
+  name: TokenNames.KeywordCapacidad,
+  pattern: /CAPACIDAD\b/,
+});
+export const KeywordMochila = createToken({
+  name: TokenNames.KeywordMochila,
+  pattern: /MOCHILA\b/,
+});
+export const KeywordRadar = createToken({ name: TokenNames.KeywordRadar, pattern: /RADAR\b/ });
+export const KeywordApuntaA = createToken({
+  name: TokenNames.KeywordApuntaA,
+  pattern: /APUNTA_A\b/,
+});
+export const KeywordSiEntrenadorDesafia = createToken({
+  name: TokenNames.KeywordSiEntrenadorDesafia,
+  pattern: /SI_ENTRENADOR_DESAFIA\b/,
+});
+export const KeywordSino = createToken({ name: TokenNames.KeywordSino, pattern: /SINO\b/ });
+export const KeywordMientrasTengaPs = createToken({
+  name: TokenNames.KeywordMientrasTengaPs,
+  pattern: /MIENTRAS_TENGA_PS\b/,
+});
+export const KeywordRetorna = createToken({
+  name: TokenNames.KeywordRetorna,
+  pattern: /RETORNA\b/,
+});
+export const KeywordPokeBall = createToken({
+  name: TokenNames.KeywordPokeBall,
+  pattern: /PokeBall\b/,
+});
+export const KeywordSuperBall = createToken({
+  name: TokenNames.KeywordSuperBall,
+  pattern: /SuperBall\b/,
+});
+export const KeywordUltraBall = createToken({
+  name: TokenNames.KeywordUltraBall,
+  pattern: /UltraBall\b/,
+});
+export const KeywordMasterBall = createToken({
+  name: TokenNames.KeywordMasterBall,
+  pattern: /MasterBall\b/,
+});
 
-// Special LValue Builtins
-export const MirarRadar = createToken({ name: 'MirarRadar', pattern: /MIRAR_RADAR/, longer_alt: Identifier })
-export const DevolverALaBall = createToken({ name: 'DevolverALaBall', pattern: /DEVOLVER_A_LA_BALL/, longer_alt: Identifier })
+export const PuebloNatal = KeywordPuebloNatal;
+export const Movimiento = KeywordMovimiento;
+export const Captura = KeywordCaptura;
+export const En = KeywordEn;
+export const Con = KeywordCon;
+export const Equipo = KeywordEquipo;
+export const De = KeywordDe;
+export const Capacidad = KeywordCapacidad;
+export const Mochila = KeywordMochila;
+export const Radar = KeywordRadar;
+export const ApuntaA = KeywordApuntaA;
+export const SiEntrenadorDesafia = KeywordSiEntrenadorDesafia;
+export const Sino = KeywordSino;
+export const MientrasTengaPs = KeywordMientrasTengaPs;
+export const Retorna = KeywordRetorna;
+export const PokeBall = KeywordPokeBall;
+export const SuperBall = KeywordSuperBall;
+export const UltraBall = KeywordUltraBall;
+export const MasterBall = KeywordMasterBall;
 
-// Operators
-export const Equal = createToken({ name: 'Equal', pattern: /==/ })
-export const NotEqual = createToken({ name: 'NotEqual', pattern: /!=/ })
-export const LessEqual = createToken({ name: 'LessEqual', pattern: /<=/ })
-export const GreaterEqual = createToken({ name: 'GreaterEqual', pattern: />=/ })
-export const LessThan = createToken({ name: 'LessThan', pattern: /</ })
-export const GreaterThan = createToken({ name: 'GreaterThan', pattern: />/ })
-export const Assign = createToken({ name: 'Assign', pattern: /=/ })
+export const MirarRadar = createToken({
+  name: TokenNames.SpecialMirarRadar,
+  pattern: /MIRAR_RADAR\b/,
+});
+export const DevolverALaBall = createToken({
+  name: TokenNames.SpecialDevolverALaBall,
+  pattern: /DEVOLVER_A_LA_BALL\b/,
+});
 
-export const Plus = createToken({ name: 'Plus', pattern: /\+/ })
-export const Minus = createToken({ name: 'Minus', pattern: /-/ })
-export const Mult = createToken({ name: 'Mult', pattern: /\*/ })
-export const Div = createToken({ name: 'Div', pattern: /\// })
-
-// Punctuation
-export const LParen = createToken({ name: 'LParen', pattern: /\(/ })
-export const RParen = createToken({ name: 'RParen', pattern: /\)/ })
-export const LBrace = createToken({ name: 'LBrace', pattern: /\{/ })
-export const RBrace = createToken({ name: 'RBrace', pattern: /\}/ })
-export const LBracket = createToken({ name: 'LBracket', pattern: /\[/ })
-export const RBracket = createToken({ name: 'RBracket', pattern: /\]/ })
-export const Comma = createToken({ name: 'Comma', pattern: /,/ })
-export const Semicolon = createToken({ name: 'Semicolon', pattern: /;/ })
-export const Colon = createToken({ name: 'Colon', pattern: /:/ })
-
-// Literals
-export const Float = createToken({ name: 'Float', pattern: /\d+\.\d+/ })
-export const Int = createToken({ name: 'Int', pattern: /\d+/ })
-export const StringLiteral = createToken({ name: 'StringLiteral', pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/ })
-
-// Ignored
-export const CommentSingle = createToken({ name: 'CommentSingle', pattern: /\/\/[^\n\r]*/, group: Lexer.SKIPPED })
-export const CommentMulti = createToken({ name: 'CommentMulti', pattern: /\/\*[\s\S]*?\*\//, group: Lexer.SKIPPED })
-export const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: /[ \t\n\r]+/, group: Lexer.SKIPPED })
+export const LParen = createToken({ name: TokenNames.LParen, pattern: /\(/ });
+export const RParen = createToken({ name: TokenNames.RParen, pattern: /\)/ });
+export const LBrace = createToken({ name: TokenNames.LBrace, pattern: /\{/ });
+export const RBrace = createToken({ name: TokenNames.RBrace, pattern: /\}/ });
+export const LBracket = createToken({ name: TokenNames.LBracket, pattern: /\[/ });
+export const RBracket = createToken({ name: TokenNames.RBracket, pattern: /\]/ });
+export const Comma = createToken({ name: TokenNames.Comma, pattern: /,/ });
+export const Semicolon = createToken({ name: TokenNames.Semicolon, pattern: /;/ });
+export const Colon = createToken({ name: TokenNames.Colon, pattern: /:/ });
+export const Assign = createToken({ name: TokenNames.Assign, pattern: /=/ });
+export const LessEqual = createToken({ name: TokenNames.LessEqual, pattern: /<=/ });
+export const GreaterEqual = createToken({ name: TokenNames.GreaterEqual, pattern: />=/ });
+export const Equal = createToken({ name: TokenNames.Equal, pattern: /==/ });
+export const NotEqual = createToken({ name: TokenNames.NotEqual, pattern: /!=/ });
+export const Plus = createToken({ name: TokenNames.Plus, pattern: /\+/ });
+export const Minus = createToken({ name: TokenNames.Minus, pattern: /-/ });
+export const Mult = createToken({ name: TokenNames.Mult, pattern: /\*/ });
+export const Div = createToken({ name: TokenNames.Div, pattern: /\// });
+export const LessThan = createToken({ name: TokenNames.LessThan, pattern: /</ });
+export const GreaterThan = createToken({ name: TokenNames.GreaterThan, pattern: />/ });
+export const Identifier = createToken({
+  name: TokenNames.Identifier,
+  pattern: /[A-Za-z_][A-Za-z0-9_]*/,
+});
 
 export const allTokens = [
   WhiteSpace,
-  CommentSingle,
-  CommentMulti,
-
-  // Keywords (longest first / longer_alt handles priority, but keep here)
-  PuebloNatal,
-  Movimiento,
-  Captura,
-  En,
-  Con,
-  Equipo,
-  De,
-  Capacidad,
-  Mochila,
-  Radar,
-  ApuntaA,
-  SiEntrenadorDesafia,
-  Sino,
-  MientrasTengaPs,
-  Retorna,
-
-  // Type Keywords
-  PokeBall,
-  SuperBall,
-  UltraBall,
-  MasterBall,
-
-  // Special LValue Builtins
+  LineComment,
+  BlockComment,
+  Float,
+  Int,
+  StringLiteral,
+  KeywordMovimiento,
+  KeywordPuebloNatal,
+  KeywordCaptura,
+  KeywordEn,
+  KeywordCon,
+  KeywordEquipo,
+  KeywordDe,
+  KeywordCapacidad,
+  KeywordMochila,
+  KeywordRadar,
+  KeywordApuntaA,
+  KeywordSiEntrenadorDesafia,
+  KeywordSino,
+  KeywordMientrasTengaPs,
+  KeywordRetorna,
+  KeywordPokeBall,
+  KeywordSuperBall,
+  KeywordUltraBall,
+  KeywordMasterBall,
   MirarRadar,
   DevolverALaBall,
-
-  // Multi-char operators
-  Equal,
-  NotEqual,
   LessEqual,
   GreaterEqual,
-
-  // Single-char operators
-  LessThan,
-  GreaterThan,
-  Assign,
-  Plus,
-  Minus,
-  Mult,
-  Div,
-
-  // Punctuation
+  Equal,
+  NotEqual,
   LParen,
   RParen,
   LBrace,
@@ -122,14 +223,21 @@ export const allTokens = [
   Comma,
   Semicolon,
   Colon,
+  Assign,
+  Plus,
+  Minus,
+  Mult,
+  Div,
+  LessThan,
+  GreaterThan,
+  Identifier,
+];
 
-  // Literals (Float before Int!)
-  Float,
-  Int,
-  StringLiteral,
+export const pokeLexer = new Lexer(allTokens);
+export const PokeLexer = pokeLexer;
 
-  // Identifier
-  Identifier
-]
+export type TokenizationResult = ReturnType<typeof pokeLexer.tokenize>;
 
-export const PokeLexer = new Lexer(allTokens)
+export function tokenizePokeCode(code: string) {
+  return pokeLexer.tokenize(code);
+}
