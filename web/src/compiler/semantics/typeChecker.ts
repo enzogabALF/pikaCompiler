@@ -61,7 +61,9 @@ function walkLValue(lvalue: LValueNode, checkVar: (name: string, loc?: SourceLoc
   }
 }
 
-type FunctionScope = ReturnType<typeof collectSymbols>['byFunction'] extends Map<string, infer T> ? T : never;
+type FunctionScope = ReturnType<typeof collectSymbols>['byFunction'] extends Map<string, infer T>
+  ? T
+  : never;
 
 function createCheckVar(
   fnName: string,
@@ -76,6 +78,14 @@ function createCheckVar(
   };
 }
 
+const BUILTIN_FUNCTIONS = new Set([
+  'DICE_PROF_OAK',
+  'OAK_PREGUNTA',
+  'UBICACION_DE',
+  'MIRAR_RADAR',
+  'DEVOLVER_A_LA_BALL',
+]);
+
 function checkCallStmt(
   stmt: Extract<StatementNode, { type: 'CallStmt' }>,
   fnName: string,
@@ -83,7 +93,7 @@ function checkCallStmt(
   global: ReturnType<typeof buildGlobalSymbolTable>,
   errors: SemanticDiagnostic[]
 ) {
-  if (!global.lookupFunction(stmt.name)) {
+  if (!global.lookupFunction(stmt.name) && !BUILTIN_FUNCTIONS.has(stmt.name)) {
     errors.push(makeError(`Call to undefined function '${stmt.name}' in ${fnName}`, stmt.loc));
   }
   for (const arg of stmt.args || []) walkExpr(arg, checkVar);
@@ -143,19 +153,13 @@ export function typeCheck(program: ProgramNode): SemanticDiagnostic[] {
   for (const fn of program.functions) {
     if (fn.returnType && !KNOWN_TYPES.has(fn.returnType)) {
       errors.push(
-        makeError(
-          `Function ${fn.name} has unknown return type '${fn.returnType}'`,
-          fn.loc
-        )
+        makeError(`Function ${fn.name} has unknown return type '${fn.returnType}'`, fn.loc)
       );
     }
     for (const p of fn.params || []) {
       if (p.typeName && !KNOWN_TYPES.has(p.typeName)) {
         errors.push(
-          makeError(
-            `Parameter ${p.name} in ${fn.name} has unknown type '${p.typeName}'`,
-            p.loc
-          )
+          makeError(`Parameter ${p.name} in ${fn.name} has unknown type '${p.typeName}'`, p.loc)
         );
       }
     }

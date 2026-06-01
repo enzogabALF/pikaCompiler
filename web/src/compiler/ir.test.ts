@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PokeLexer } from './lexer';
 import { parser } from './parser';
 import { cstToAst } from './ast';
-import { lowerProgramToIR } from './ir';
+import { lowerProgramToIR, optimizeIR } from './ir';
 
 function parseProgram(code: string) {
   const lexResult = PokeLexer.tokenize(code);
@@ -59,6 +59,40 @@ describe('IR lowering', () => {
           ],
         },
       ],
+    });
+  });
+});
+
+describe('IR constant folding optimization', () => {
+  it('simplifica sumas, multiplicaciones y comparaciones constantes', () => {
+    const program = parseProgram(`
+      PUEBLO_NATAL() {
+        CAPTURA calculo EN PokeBall CON 5 + 3 * 2;
+        CAPTURA comparacion EN MasterBall CON (10 > 5) == (2 < 1);
+      }
+    `);
+
+    const rawIr = lowerProgramToIR(program);
+    const opt = optimizeIR(rawIr);
+
+    expect(opt.functions[0].body[0]).toMatchObject({
+      type: 'IRDeclare',
+      name: 'calculo',
+      value: {
+        type: 'IRLiteral',
+        value: 11,
+        valueType: 'int',
+      },
+    });
+
+    expect(opt.functions[0].body[1]).toMatchObject({
+      type: 'IRDeclare',
+      name: 'comparacion',
+      value: {
+        type: 'IRLiteral',
+        value: false,
+        valueType: 'bool',
+      },
     });
   });
 });

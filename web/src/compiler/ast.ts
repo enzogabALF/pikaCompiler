@@ -273,10 +273,13 @@ function buildIdentifierOrCallExpr(ctx: any, name: string): ExprNode {
   if (ctx.expr && ctx.expr.length > 0) {
     const args = ctx.expr ? ctx.expr.map((e: any) => visitor.visit(e)) : [];
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const p = require('path');
       const logPath = p.join(__dirname, '..', '..', 'tmp', 'ast-visits.log');
       fs.appendFileSync(logPath, ` -> CallExpr args=${args.length}\n`);
+      // eslint-disable-next-line no-empty
     } catch (e) {}
     return {
       type: 'CallExpr',
@@ -286,10 +289,13 @@ function buildIdentifierOrCallExpr(ctx: any, name: string): ExprNode {
     };
   }
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const p = require('path');
     const logPath = p.join(__dirname, '..', '..', 'tmp', 'ast-visits.log');
     fs.appendFileSync(logPath, ` -> LValueExpr\n`);
+    // eslint-disable-next-line no-empty
   } catch (e) {}
 
   return {
@@ -314,7 +320,11 @@ class PokeCstVisitor extends BaseCstVisitor {
     return {
       type: 'Program',
       functions,
-      loc: makeLoc(firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']), firstToken(ctx, ['RBrace'])) ?? undefined,
+      loc:
+        makeLoc(
+          firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']),
+          firstToken(ctx, ['RBrace'])
+        ) ?? undefined,
     };
   }
 
@@ -332,7 +342,10 @@ class PokeCstVisitor extends BaseCstVisitor {
       params,
       returnType,
       body,
-      loc: makeLoc(firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']), firstToken(ctx, ['RBrace'])),
+      loc: makeLoc(
+        firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']),
+        firstToken(ctx, ['RBrace'])
+      ),
     };
   }
 
@@ -553,7 +566,10 @@ class PokeCstVisitor extends BaseCstVisitor {
           op,
           left: result,
           right,
-          loc: makeLoc(firstToken(ctx, ['multiplicationExpr']), firstToken(ctx, ['multiplicationExpr'])),
+          loc: makeLoc(
+            firstToken(ctx, ['multiplicationExpr']),
+            firstToken(ctx, ['multiplicationExpr'])
+          ),
         };
       }
     }
@@ -586,7 +602,10 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'CallExpr',
       name,
       args: [arg],
-      loc: makeLoc(firstToken(ctx, ['SpecialMirarRadar', 'SpecialDevolverALaBall']), firstToken(ctx, ['RParen'])),
+      loc: makeLoc(
+        firstToken(ctx, ['SpecialMirarRadar', 'SpecialDevolverALaBall']),
+        firstToken(ctx, ['RParen'])
+      ),
     };
   }
 

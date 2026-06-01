@@ -1,5 +1,5 @@
 import { cstToAst } from '../compiler/ast';
-import { lowerProgramToIR } from '../compiler/ir';
+import { lowerProgramToIR, optimizeIR } from '../compiler/ir';
 import { parser } from '../compiler/parser';
 import { tokenizePokeCode } from '../compiler/lexer';
 import { typeCheck } from '../compiler/semantics/typeChecker';
@@ -13,7 +13,13 @@ type Diagnostic = {
   endColumn?: number;
 };
 
-function toDiagnostic(message: string, line = 1, column = 1, endLine?: number, endColumn?: number): Diagnostic {
+function toDiagnostic(
+  message: string,
+  line = 1,
+  column = 1,
+  endLine?: number,
+  endColumn?: number
+): Diagnostic {
   return { message, line, column, endLine, endColumn };
 }
 
@@ -23,7 +29,13 @@ function getSyntaxDiagnostic(err: any): Diagnostic {
   const column = token?.startColumn ?? 1;
   const endLine = token?.endLine ?? line;
   const endColumn = token?.endColumn ?? column;
-  return toDiagnostic(`Syntax error: ${err?.message ?? 'Unknown syntax error'}`, line, column, endLine, endColumn);
+  return toDiagnostic(
+    `Syntax error: ${err?.message ?? 'Unknown syntax error'}`,
+    line,
+    column,
+    endLine,
+    endColumn
+  );
 }
 
 onmessage = (e) => {
@@ -62,6 +74,7 @@ onmessage = (e) => {
   try {
     const ast = cstToAst(cst);
     const ir = lowerProgramToIR(ast);
+    const optimizedIr = optimizeIR(ir);
     const execution = executeProgram(ast);
 
     const semErrors = typeCheck(ast);
@@ -88,6 +101,8 @@ onmessage = (e) => {
         JSON.stringify(ast, null, 2) +
         '\n\n--- IR GENERADO ---\n' +
         JSON.stringify(ir, null, 2) +
+        '\n\n--- IR OPTIMIZADO (Constant Folding) ---\n' +
+        JSON.stringify(optimizedIr, null, 2) +
         '\n\n--- EJECUCIÓN ---\n' +
         `Entrada: ${execution.entryFunction || 'sin entrada'}\n` +
         `Retorno: ${String(execution.returnValue)}\n` +

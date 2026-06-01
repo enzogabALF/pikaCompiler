@@ -131,7 +131,10 @@ function resolveTarget(
         read: () => {
           const target = getValue(env, lvalue.name, lvalue.loc ?? loc);
           if (!isArrayValue(target)) {
-            throw new InterpreterError(`Variable '${lvalue.name}' is not indexable`, lvalue.loc ?? loc);
+            throw new InterpreterError(
+              `Variable '${lvalue.name}' is not indexable`,
+              lvalue.loc ?? loc
+            );
           }
           const index = toNumber(evaluateExpr(lvalue.index, env, context), lvalue.index.loc);
           const slot = target.elements[index];
@@ -140,11 +143,17 @@ function resolveTarget(
         write: (value) => {
           const target = getValue(env, lvalue.name, lvalue.loc ?? loc);
           if (!isArrayValue(target)) {
-            throw new InterpreterError(`Variable '${lvalue.name}' is not indexable`, lvalue.loc ?? loc);
+            throw new InterpreterError(
+              `Variable '${lvalue.name}' is not indexable`,
+              lvalue.loc ?? loc
+            );
           }
           const index = toNumber(evaluateExpr(lvalue.index, env, context), lvalue.index.loc);
           if (index < 0 || index >= target.elements.length) {
-            throw new InterpreterError(`Index ${index} out of bounds for '${lvalue.name}'`, lvalue.loc ?? loc);
+            throw new InterpreterError(
+              `Index ${index} out of bounds for '${lvalue.name}'`,
+              lvalue.loc ?? loc
+            );
           }
           target.elements[index] = value;
         },
@@ -158,6 +167,10 @@ function resolveTarget(
             if (!isRadarValue(reference)) {
               throw new InterpreterError('MIRAR_RADAR expects a radar value', lvalue.loc ?? loc);
             }
+            const ref = reference as any;
+            if (ref.targetVar && ref.targetEnv) {
+              return getValue(ref.targetEnv, ref.targetVar, lvalue.loc ?? loc);
+            }
             return reference.value;
           }
           return reference;
@@ -169,6 +182,10 @@ function resolveTarget(
               throw new InterpreterError('MIRAR_RADAR expects a radar value', lvalue.loc ?? loc);
             }
             reference.value = value;
+            const ref = reference as any;
+            if (ref.targetVar && ref.targetEnv) {
+              setValue(ref.targetEnv, ref.targetVar, value, lvalue.loc ?? loc);
+            }
             return;
           }
 
@@ -177,7 +194,10 @@ function resolveTarget(
             return;
           }
 
-          throw new InterpreterError('DEVOLVER_A_LA_BALL expects an identifier reference', lvalue.loc ?? loc);
+          throw new InterpreterError(
+            'DEVOLVER_A_LA_BALL expects an identifier reference',
+            lvalue.loc ?? loc
+          );
         },
       };
     }
@@ -190,7 +210,13 @@ type ExecutionContext = {
   output: string[];
 };
 
-function evaluateCall(name: string, args: ExprNode[], env: RuntimeEnv, context: ExecutionContext, loc?: SourceLocation): RuntimeValue {
+function evaluateCall(
+  name: string,
+  args: ExprNode[],
+  env: RuntimeEnv,
+  context: ExecutionContext,
+  loc?: SourceLocation
+): RuntimeValue {
   const evaluatedArgs = args.map((arg) => evaluateExpr(arg, env, context));
 
   switch (name) {
@@ -203,6 +229,31 @@ function evaluateCall(name: string, args: ExprNode[], env: RuntimeEnv, context: 
     }
     case 'DEVOLVER_A_LA_BALL':
       return evaluatedArgs[0] ?? null;
+    case 'DICE_PROF_OAK': {
+      const val = evaluatedArgs[0];
+      const str = typeof val === 'string' ? val : formatValue(val);
+      context.output.push(str);
+      return null;
+    }
+    case 'OAK_PREGUNTA': {
+      return 25;
+    }
+    case 'UBICACION_DE': {
+      const arg = args[0];
+      let targetVar: string | undefined = undefined;
+      if (arg.type === 'Identifier') {
+        targetVar = arg.name;
+      } else if (arg.type === 'LValueExpr' && arg.lvalue.type === 'IdentifierLValue') {
+        targetVar = arg.lvalue.name;
+      }
+      return {
+        kind: 'radar',
+        targetType: 'PokeBall',
+        value: evaluatedArgs[0] ?? null,
+        targetVar,
+        targetEnv: env,
+      } as any;
+    }
     default: {
       const fn = context.functions.get(name);
       if (!fn) {
@@ -264,14 +315,21 @@ function evaluateExpr(expr: ExprNode, env: RuntimeEnv, context: ExecutionContext
   }
 }
 
-function executeStatement(stmt: StatementNode, env: RuntimeEnv, context: ExecutionContext): ReturnSignal | undefined {
+function executeStatement(
+  stmt: StatementNode,
+  env: RuntimeEnv,
+  context: ExecutionContext
+): ReturnSignal | undefined {
   switch (stmt.type) {
     case 'CaptureDecl': {
       env.values.set(stmt.name, evaluateExpr(stmt.value, env, context));
       return undefined;
     }
     case 'EquipoDecl': {
-      const capacity = Math.max(0, Math.trunc(toNumber(evaluateExpr(stmt.capacity, env, context), stmt.capacity.loc)));
+      const capacity = Math.max(
+        0,
+        Math.trunc(toNumber(evaluateExpr(stmt.capacity, env, context), stmt.capacity.loc))
+      );
       env.values.set(stmt.name, {
         kind: 'array',
         elements: new Array<RuntimeValue>(capacity).fill(null),
@@ -305,7 +363,9 @@ function executeStatement(stmt: StatementNode, env: RuntimeEnv, context: Executi
       evaluateCall(stmt.name, stmt.args, env, context, stmt.loc);
       return undefined;
     case 'IfStmt': {
-      const branch = truthy(evaluateExpr(stmt.test, env, context)) ? stmt.consequent : stmt.alternate;
+      const branch = truthy(evaluateExpr(stmt.test, env, context))
+        ? stmt.consequent
+        : stmt.alternate;
       if (!branch) return undefined;
       const result = executeStatements(branch, env, context);
       if (result instanceof ReturnSignal) return result;
@@ -328,7 +388,11 @@ function executeStatement(stmt: StatementNode, env: RuntimeEnv, context: Executi
   }
 }
 
-function executeStatements(statements: StatementNode[], env: RuntimeEnv, context: ExecutionContext): ReturnSignal | undefined {
+function executeStatements(
+  statements: StatementNode[],
+  env: RuntimeEnv,
+  context: ExecutionContext
+): ReturnSignal | undefined {
   for (const stmt of statements) {
     const result = executeStatement(stmt, env, context);
     if (result instanceof ReturnSignal) {
@@ -343,10 +407,14 @@ export function executeProgram(program: ProgramNode): ExecutionResult {
   try {
     // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
     const fs = require('fs');
+    // eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
     const p = require('path');
     const logPath = p.join(__dirname, '..', '..', 'tmp', 'interpreter.log');
     fs.mkdirSync(p.dirname(logPath), { recursive: true });
-    fs.appendFileSync(logPath, `[executeProgram] functions=${JSON.stringify(program.functions.map((f: any) => f.name))}\n`);
+    fs.appendFileSync(
+      logPath,
+      `[executeProgram] functions=${JSON.stringify(program.functions.map((f: any) => f.name))}\n`
+    );
   } catch (e) {
     // ignore
   }

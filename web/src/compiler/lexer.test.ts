@@ -87,7 +87,9 @@ describe('poke lexer', () => {
   });
 
   it('reconoce símbolos temáticos de lista, estructura y especiales', () => {
-    const names = tokenNames('MOCHILA [x, y]: EQUIPO DE 3 RADAR APUNTA_A MIRAR_RADAR DEVOLVER_A_LA_BALL');
+    const names = tokenNames(
+      'MOCHILA [x, y]: EQUIPO DE 3 RADAR APUNTA_A MIRAR_RADAR DEVOLVER_A_LA_BALL'
+    );
 
     expect(names).toEqual([
       TokenNames.KeywordMochila,

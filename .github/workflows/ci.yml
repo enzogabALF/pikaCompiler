@@ -24,7 +24,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run lint
         run: pnpm lint
-      - name: Run tests
-        run: pnpm test
+      - name: Run Unit and E2E Tests
+        run: pnpm test -- --run
       - name: Build web
         run: pnpm build
