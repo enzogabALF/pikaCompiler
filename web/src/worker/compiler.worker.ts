@@ -1,6 +1,7 @@
 import { cstToAst } from '../compiler/ast';
 import { parser } from '../compiler/parser';
 import { tokenizePokeCode } from '../compiler/lexer';
+import { typeCheck } from '../compiler/semantics/typeChecker';
 
 onmessage = (e) => {
   const code = e.data.code || '';
@@ -29,15 +30,19 @@ onmessage = (e) => {
 
   try {
     const ast = cstToAst(cst);
+
+    const semErrors = typeCheck(ast);
+    if (semErrors.length) {
+      postMessage({ type: 'errors', errors: semErrors.map((e) => `Semantic error: ${e}`) });
+      return;
+    }
+
     postMessage({
       type: 'result',
       text: 'Parsed OK!\n\n--- AST GENERADO ---\n' + JSON.stringify(ast, null, 2),
       ast,
     });
   } catch (err: any) {
-    postMessage({
-      type: 'errors',
-      errors: [`AST Translation Error: ${err.message}`],
-    });
+    postMessage({ type: 'errors', errors: [`AST Translation Error: ${err.message}`] });
   }
 };
