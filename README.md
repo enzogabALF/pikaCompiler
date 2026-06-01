@@ -8,13 +8,13 @@ Implementado hoy:
 - Análisis léxico básico en el worker del frontend.
 - Análisis sintáctico básico con Chevrotain.
 - Traducción CST a AST y salida estructurada del compilador.
-- Reglas semánticas temáticas iniciales documentadas en [docs/syntax_and_semantics.md](docs/syntax_and_semantics.md).
+- Reglas semánticas temáticas implementadas y tests asociados.
+- Representación intermedia (IR) con optimización de folding constante.
+- Intérprete/ejecutor mínimo que implementa builtins temáticos y ejecución de programas.
 - Flujo de desarrollo con `pnpm`, `turbo`, `ESLint`, `Prettier` y `Husky`.
 
-Pendiente:
-- Análisis semántico completo.
-- IR y optimización.
-- Generación de código o intérprete avanzado.
+Estado:
+- Fases 1-5: léxico, sintáctico, semántico, IR/optimización y ejecutor mínimo están conectadas y probadas con suites unitarias e2e.
 
 ## Estructura relevante
 

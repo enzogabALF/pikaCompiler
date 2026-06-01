@@ -19,7 +19,12 @@ export function collectSymbols(program: ProgramNode) {
         fnTable.defineVar({ name: s.name, typeName: s.typeName });
       } else if ((stmt as any).type === 'EquipoDecl') {
         const s = stmt as any;
-        fnTable.defineVar({ name: s.name, typeName: s.typeName });
+        // capture capacity when it's a literal integer
+        const cap =
+          s.capacity && s.capacity.type === 'Literal' && s.capacity.valueType === 'int'
+            ? Number(s.capacity.value)
+            : undefined;
+        fnTable.defineVar({ name: s.name, typeName: s.typeName, capacity: cap });
       } else if ((stmt as any).type === 'MochilaDecl') {
         const s = stmt as any;
         fnTable.defineVar({ name: s.name, typeName: s.typeName });

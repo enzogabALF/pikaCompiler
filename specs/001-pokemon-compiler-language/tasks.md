@@ -15,5 +15,5 @@
 ## Próximas tareas
 
 - [ ] T007 Completar el análisis semántico del lenguaje
-- [ ] T008 Añadir IR y optimización
-- [ ] T009 Implementar generación de código o intérprete
+- [x] T008 Añadir IR y optimización (implementado)
+- [x] T009 Implementar generación de código o intérprete (intérprete mínimo implementado)

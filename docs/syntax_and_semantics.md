@@ -106,16 +106,35 @@ Expr ::= ... (operadores aritméticos y comparaciones, llamadas, identificadores
 - Uso ilegal de `DEVOLVER_A_LA_BALL`
 
 9) Limitaciones actuales
-- El parser aún no soporta parámetros de función; por tanto no hay comprobación de firma/params.
+- El parser aún no soporta parámetros de función complejos ni verificación exhaustiva de firmas; las firmas simples están presentes.
 - No hay inferencia de tipos compleja ni sistema de tipos estructural.
-- La Fase 4 (IR/optimización) todavía no existe en el worker actual.
-- La Fase 5 (generación de código objeto o backend de ejecución) todavía no existe en el worker actual.
 
-10) Cómo probar
-Ejecutar:
+10) Fase 4: IR y optimización
+- El compilador genera una `IRProgram` con funciones `IRFunction` y statements/interms definidos en `web/src/compiler/ir.ts`.
+- Implementa una optimización de "constant folding" que reduce expresiones binarias con literales a `IRLiteral`.
+
+11) Fase 5: Intérprete / ejecutor
+- Se incluye un intérprete mínimo en `web/src/compiler/interpreter.ts` que ejecuta el AST directamente y soporta:
+  - Declaraciones `CAPTURA`, `EQUIPO`, `MOCHILA`, `RADAR`.
+  - Asignaciones y acceso por índice con comprobación de bounds en tiempo de ejecución.
+  - Builtins: `DICE_PROF_OAK`, `OAK_PREGUNTA`, `UBICACION_DE`, `MIRAR_RADAR`, `DEVOLVER_A_LA_BALL`.
+  - Control de flujo: `SI_ENTRENADOR_DESAFIA`, `MIENTRAS_TENGA_PS`, `RETORNA`.
+
+12) Cómo probar localmente
+Desde la raíz del repo:
+
 ```bash
-python src/semantics_runner.py examples/pueblo.pika
+pnpm install
+pnpm --dir web test
 ```
+
+Para ejecutar un programa de ejemplo desde el código de pruebas (ej. `examples/pueblo.pika`), use las utilidades de la carpeta `web` o las pruebas E2E incluidas. Las suites de `vitest` cubren el pipeline completo: lexer → parser → ast → semántica → IR → optimización → intérprete.
+
+13) Próximos pasos recomendados
+- Añadir parsing de parámetros y tipos de retorno más extensos en `FunctionDecl`.
+- Implementar comprobación de firmas y compatibilidad argumental en el analizador semántico.
+- Extender el optimizador con pasos adicionales (propagación de constantes, eliminación de dead code).
+- Añadir una ruta de generación de código (emitir JS/bytecode) o exponer el intérprete como backend reusable.
 
 11) Próximos pasos recomendados
 - Añadir parsing de parámetros y tipos de retorno en `FunctionDecl`.

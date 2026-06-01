@@ -1,6 +1,6 @@
 import { ProgramNode, FunctionDeclNode, ParameterNode } from '../ast';
 
-export type VarInfo = { name: string; typeName?: string };
+export type VarInfo = { name: string; typeName?: string; capacity?: number };
 export type FuncInfo = { name: string; kind: string; params: ParameterNode[]; returnType?: string };
 
 export class SymbolTable {

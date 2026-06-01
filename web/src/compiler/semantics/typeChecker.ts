@@ -61,6 +61,59 @@ function walkLValue(lvalue: LValueNode, checkVar: (name: string, loc?: SourceLoc
   }
 }
 
+function validateLValue(
+  lvalue: LValueNode,
+  fnName: string,
+  fnTable: FunctionScope,
+  global: ReturnType<typeof buildGlobalSymbolTable>,
+  errors: SemanticDiagnostic[]
+) {
+  const checkVar = createCheckVar(fnName, fnTable, global, errors);
+  switch (lvalue.type) {
+    case 'IdentifierLValue':
+      checkVar(lvalue.name, locFrom(lvalue));
+      return;
+    case 'IndexLValue':
+      checkVar(lvalue.name, locFrom(lvalue));
+      // if index is a literal integer and we know the capacity, validate bounds
+      if ((lvalue as any).index && (lvalue as any).index.type === 'Literal') {
+        const idxNode = (lvalue as any).index as any;
+        if (idxNode.valueType === 'int') {
+          const idx = Number(idxNode.value);
+          const varInfo = fnTable.lookupVar(lvalue.name as string) as any;
+          if (varInfo && typeof varInfo.capacity === 'number') {
+            if (idx < 0 || idx >= varInfo.capacity) {
+              errors.push(
+                makeError(
+                  `Index ${idx} out of bounds for '${lvalue.name}' (capacity ${varInfo.capacity}) in ${fnName}`,
+                  locFrom(lvalue)
+                )
+              );
+            }
+          }
+        }
+      }
+      // still walk index expr to check nested identifiers
+      walkExpr((lvalue as any).index as ExprNode, checkVar);
+      return;
+    case 'SpecialLValue':
+      // Only DEVOLVER_A_LA_BALL must appear inside MOVIMIENTO functions
+      if ((lvalue as any).kind === 'DEVOLVER_A_LA_BALL') {
+        const funcInfo = global.lookupFunction(fnName);
+        if (funcInfo && (funcInfo as any).kind !== 'MOVIMIENTO') {
+          errors.push(
+            makeError(
+              `'DEVOLVER_A_LA_BALL' used outside a MOVIMIENTO function in ${fnName}`,
+              locFrom(lvalue)
+            )
+          );
+        }
+      }
+      walkExpr((lvalue as any).arg as ExprNode, checkVar);
+      return;
+  }
+}
+
 type FunctionScope = ReturnType<typeof collectSymbols>['byFunction'] extends Map<string, infer T>
   ? T
   : never;
@@ -116,14 +169,37 @@ function checkStatementList(
         checkCallStmt(stmt, fnName, checkVar, global, errors);
         break;
       case 'AssignmentStmt':
-        walkLValue(stmt.lvalue, checkVar);
+        validateLValue(stmt.lvalue, fnName, fnTable, global, errors);
         walkExpr(stmt.value, checkVar);
         break;
       case 'CaptureDecl':
         walkExpr(stmt.value, checkVar);
         break;
       case 'EquipoDecl':
+        // validate capacity expression and known literal bounds
         walkExpr(stmt.capacity, checkVar);
+        if ((stmt as any).capacity && (stmt as any).capacity.type === 'Literal') {
+          const capNode = (stmt as any).capacity as any;
+          if (capNode.valueType === 'int') {
+            const cap = Number(capNode.value);
+            if (cap < 0) {
+              errors.push(
+                makeError(
+                  `Equipo '${(stmt as any).name}' has negative capacity ${cap}`,
+                  locFrom(stmt)
+                )
+              );
+            }
+            if (cap > 6) {
+              errors.push(
+                makeError(
+                  `Equipo '${(stmt as any).name}' exceeds max capacity 6 (found ${cap})`,
+                  locFrom(stmt)
+                )
+              );
+            }
+          }
+        }
         break;
       case 'IfStmt':
         walkExpr(stmt.test, checkVar);
