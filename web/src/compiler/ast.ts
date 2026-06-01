@@ -2,6 +2,17 @@ import { parser } from './parser';
 
 // --- AST Interfaces ---
 
+export interface SourceLocation {
+  startLine: number;
+  startColumn: number;
+  endLine: number;
+  endColumn: number;
+}
+
+export interface Locatable {
+  loc?: SourceLocation;
+}
+
 export type ASTNode =
   | ProgramNode
   | FunctionDeclNode
@@ -13,12 +24,14 @@ export type ASTNode =
 export interface ProgramNode {
   type: 'Program';
   functions: FunctionDeclNode[];
+  loc?: SourceLocation;
 }
 
 export interface ParameterNode {
   type: 'Parameter';
   name: string;
   typeName: string; // 'PokeBall' | 'SuperBall' | 'UltraBall' | 'MasterBall'
+  loc?: SourceLocation;
 }
 
 export interface FunctionDeclNode {
@@ -28,6 +41,7 @@ export interface FunctionDeclNode {
   params: ParameterNode[];
   returnType?: string;
   body: StatementNode[];
+  loc?: SourceLocation;
 }
 
 export type StatementNode =
@@ -46,6 +60,7 @@ export interface CaptureDeclNode {
   name: string;
   typeName: string;
   value: ExprNode;
+  loc?: SourceLocation;
 }
 
 export interface EquipoDeclNode {
@@ -53,18 +68,21 @@ export interface EquipoDeclNode {
   name: string;
   typeName: string;
   capacity: ExprNode;
+  loc?: SourceLocation;
 }
 
 export interface MochilaDeclNode {
   type: 'MochilaDecl';
   name: string;
   typeName: string;
+  loc?: SourceLocation;
 }
 
 export interface RadarDeclNode {
   type: 'RadarDecl';
   name: string;
   typeName: string;
+  loc?: SourceLocation;
 }
 
 export interface IfStmtNode {
@@ -72,29 +90,34 @@ export interface IfStmtNode {
   test: ExprNode;
   consequent: StatementNode[];
   alternate?: StatementNode[];
+  loc?: SourceLocation;
 }
 
 export interface WhileStmtNode {
   type: 'WhileStmt';
   test: ExprNode;
   body: StatementNode[];
+  loc?: SourceLocation;
 }
 
 export interface AssignmentStmtNode {
   type: 'AssignmentStmt';
   lvalue: LValueNode;
   value: ExprNode;
+  loc?: SourceLocation;
 }
 
 export interface CallStmtNode {
   type: 'CallStmt';
   name: string;
   args: ExprNode[];
+  loc?: SourceLocation;
 }
 
 export interface ReturnStmtNode {
   type: 'ReturnStmt';
   value?: ExprNode;
+  loc?: SourceLocation;
 }
 
 export type ExprNode = LiteralNode | IdentifierNode | BinOpNode | CallExprNode | LValueExprNode;
@@ -103,11 +126,13 @@ export interface LiteralNode {
   type: 'Literal';
   value: number | string | boolean;
   valueType: 'int' | 'float' | 'string' | 'bool';
+  loc?: SourceLocation;
 }
 
 export interface IdentifierNode {
   type: 'Identifier';
   name: string;
+  loc?: SourceLocation;
 }
 
 export interface BinOpNode {
@@ -115,17 +140,20 @@ export interface BinOpNode {
   op: '+' | '-' | '*' | '/' | '<' | '>' | '==' | '!=' | '<=' | '>=' | '[]';
   left: ExprNode;
   right: ExprNode;
+  loc?: SourceLocation;
 }
 
 export interface CallExprNode {
   type: 'CallExpr';
   name: string;
   args: ExprNode[];
+  loc?: SourceLocation;
 }
 
 export interface LValueExprNode {
   type: 'LValueExpr';
   lvalue: LValueNode;
+  loc?: SourceLocation;
 }
 
 export type LValueNode = IdentifierLValueNode | IndexLValueNode | SpecialLValueNode;
@@ -133,18 +161,21 @@ export type LValueNode = IdentifierLValueNode | IndexLValueNode | SpecialLValueN
 export interface IdentifierLValueNode {
   type: 'IdentifierLValue';
   name: string;
+  loc?: SourceLocation;
 }
 
 export interface IndexLValueNode {
   type: 'IndexLValue';
   name: string;
   index: ExprNode;
+  loc?: SourceLocation;
 }
 
 export interface SpecialLValueNode {
   type: 'SpecialLValue';
   kind: 'MIRAR_RADAR' | 'DEVOLVER_A_LA_BALL';
   arg: ExprNode;
+  loc?: SourceLocation;
 }
 
 // --- CST Visitor Implementation ---
@@ -178,6 +209,100 @@ function getFirstTokenStartOffset(node: any): number {
   return Number.POSITIVE_INFINITY;
 }
 
+function makeLoc(startToken?: any, endToken?: any): SourceLocation | undefined {
+  if (!startToken) return undefined;
+  return {
+    startLine: startToken.startLine ?? 1,
+    startColumn: startToken.startColumn ?? 1,
+    endLine: endToken?.endLine ?? startToken.endLine ?? startToken.startLine ?? 1,
+    endColumn: endToken?.endColumn ?? startToken.endColumn ?? (startToken.startColumn ?? 1) + 1,
+  };
+}
+
+function firstToken(ctx: unknown, keys: string[]): unknown {
+  const record = ctx as Record<string, unknown>;
+  for (const key of keys) {
+    const value = record[key] as unknown[] | undefined;
+    if (value?.[0]) return value[0];
+  }
+  return undefined;
+}
+
+function buildLiteralExpr(kind: 'float' | 'int' | 'string', token: any): LiteralNode {
+  if (kind === 'float') {
+    return {
+      type: 'Literal',
+      value: Number.parseFloat(token.image),
+      valueType: 'float',
+      loc: makeLoc(token, token),
+    };
+  }
+
+  if (kind === 'int') {
+    return {
+      type: 'Literal',
+      value: Number.parseInt(token.image, 10),
+      valueType: 'int',
+      loc: makeLoc(token, token),
+    };
+  }
+
+  return {
+    type: 'Literal',
+    value: token.image.slice(1, -1),
+    valueType: 'string',
+    loc: makeLoc(token, token),
+  };
+}
+
+function buildIdentifierOrCallExpr(ctx: any, name: string): ExprNode {
+  if (ctx.LBracket) {
+    const index = visitor.visit(ctx.expr[0]);
+    return {
+      type: 'LValueExpr',
+      lvalue: {
+        type: 'IndexLValue',
+        name,
+        index,
+        loc: makeLoc(ctx.Identifier[0], ctx.RBracket ? ctx.RBracket[0] : ctx.Identifier[0]),
+      },
+      loc: makeLoc(ctx.Identifier[0], ctx.RBracket ? ctx.RBracket[0] : ctx.Identifier[0]),
+    };
+  }
+
+  if (ctx.expr && ctx.expr.length > 0) {
+    const args = ctx.expr ? ctx.expr.map((e: any) => visitor.visit(e)) : [];
+    try {
+      const fs = require('fs');
+      const p = require('path');
+      const logPath = p.join(__dirname, '..', '..', 'tmp', 'ast-visits.log');
+      fs.appendFileSync(logPath, ` -> CallExpr args=${args.length}\n`);
+    } catch (e) {}
+    return {
+      type: 'CallExpr',
+      name,
+      args,
+      loc: makeLoc(ctx.Identifier[0], ctx.RParen ? ctx.RParen[0] : ctx.Identifier[0]),
+    };
+  }
+  try {
+    const fs = require('fs');
+    const p = require('path');
+    const logPath = p.join(__dirname, '..', '..', 'tmp', 'ast-visits.log');
+    fs.appendFileSync(logPath, ` -> LValueExpr\n`);
+  } catch (e) {}
+
+  return {
+    type: 'LValueExpr',
+    lvalue: {
+      type: 'IdentifierLValue',
+      name,
+      loc: makeLoc(ctx.Identifier[0], ctx.Identifier[0]),
+    },
+    loc: makeLoc(ctx.Identifier[0], ctx.Identifier[0]),
+  };
+}
+
 class PokeCstVisitor extends BaseCstVisitor {
   constructor() {
     super();
@@ -189,6 +314,7 @@ class PokeCstVisitor extends BaseCstVisitor {
     return {
       type: 'Program',
       functions,
+      loc: makeLoc(firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']), firstToken(ctx, ['RBrace'])) ?? undefined,
     };
   }
 
@@ -206,6 +332,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       params,
       returnType,
       body,
+      loc: makeLoc(firstToken(ctx, ['KeywordPuebloNatal', 'KeywordMovimiento']), firstToken(ctx, ['RBrace'])),
     };
   }
 
@@ -224,6 +351,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'Parameter',
       name,
       typeName,
+      loc: makeLoc(firstToken(ctx, ['Identifier']), firstToken(ctx, ['typeName'])),
     };
   }
 
@@ -244,12 +372,15 @@ class PokeCstVisitor extends BaseCstVisitor {
   captureDecl(ctx: any): CaptureDeclNode {
     const name = ctx.Identifier[0].image;
     const typeName = this.visit(ctx.typeName[0]);
-    const value = this.visit(ctx.expr[0]);
+    // Use the last expr occurrence to capture the outermost expression (handles nested exprs inside calls)
+    const exprIndex = Array.isArray(ctx.expr) ? ctx.expr.length - 1 : 0;
+    const value = this.visit(ctx.expr[exprIndex]);
     return {
       type: 'CaptureDecl',
       name,
       typeName,
       value,
+      loc: makeLoc(firstToken(ctx, ['KeywordCaptura']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -262,6 +393,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       name,
       typeName,
       capacity,
+      loc: makeLoc(firstToken(ctx, ['KeywordEquipo']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -272,6 +404,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'MochilaDecl',
       name,
       typeName,
+      loc: makeLoc(firstToken(ctx, ['KeywordMochila']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -282,6 +415,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'RadarDecl',
       name,
       typeName,
+      loc: makeLoc(firstToken(ctx, ['KeywordRadar']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -303,6 +437,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       alternate: alternateStatements.length
         ? alternateStatements.map((s: any) => this.visit(s))
         : undefined,
+      loc: makeLoc(firstToken(ctx, ['KeywordSiEntrenadorDesafia']), firstToken(ctx, ['RBrace'])),
     };
   }
 
@@ -313,6 +448,7 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'WhileStmt',
       test,
       body,
+      loc: makeLoc(firstToken(ctx, ['KeywordMientrasTengaPs']), firstToken(ctx, ['RBrace'])),
     };
   }
 
@@ -321,6 +457,7 @@ class PokeCstVisitor extends BaseCstVisitor {
     return {
       type: 'ReturnStmt',
       value,
+      loc: makeLoc(firstToken(ctx, ['KeywordRetorna']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -334,8 +471,10 @@ class PokeCstVisitor extends BaseCstVisitor {
         type: 'SpecialLValue',
         kind,
         arg,
+        loc: makeLoc(firstToken(ctx, ['SpecialMirarRadar']), firstToken(ctx, ['RParen'])),
       },
       value,
+      loc: makeLoc(firstToken(ctx, ['SpecialMirarRadar']), firstToken(ctx, ['Semicolon'])),
     };
   }
 
@@ -347,6 +486,7 @@ class PokeCstVisitor extends BaseCstVisitor {
         type: 'CallStmt',
         name,
         args,
+        loc: makeLoc(firstToken(ctx, ['Identifier']), firstToken(ctx, ['Semicolon'])),
       };
     } else if (ctx.LBracket) {
       const index = this.visit(ctx.expr[0]);
@@ -357,8 +497,10 @@ class PokeCstVisitor extends BaseCstVisitor {
           type: 'IndexLValue',
           name,
           index,
+          loc: makeLoc(ctx.Identifier[0], ctx.RBracket ? ctx.RBracket[0] : ctx.Identifier[0]),
         },
         value,
+        loc: makeLoc(firstToken(ctx, ['Identifier']), firstToken(ctx, ['Semicolon'])),
       };
     } else {
       const value = this.visit(ctx.expr[0]);
@@ -367,8 +509,10 @@ class PokeCstVisitor extends BaseCstVisitor {
         lvalue: {
           type: 'IdentifierLValue',
           name,
+          loc: makeLoc(ctx.Identifier[0], ctx.Identifier[0]),
         },
         value,
+        loc: makeLoc(firstToken(ctx, ['Identifier']), firstToken(ctx, ['Semicolon'])),
       };
     }
   }
@@ -391,6 +535,7 @@ class PokeCstVisitor extends BaseCstVisitor {
         op,
         left,
         right,
+        loc: makeLoc(firstToken(ctx, ['additionExpr']), firstToken(ctx, ['additionExpr'])),
       };
     }
     return left;
@@ -408,6 +553,7 @@ class PokeCstVisitor extends BaseCstVisitor {
           op,
           left: result,
           right,
+          loc: makeLoc(firstToken(ctx, ['multiplicationExpr']), firstToken(ctx, ['multiplicationExpr'])),
         };
       }
     }
@@ -426,6 +572,7 @@ class PokeCstVisitor extends BaseCstVisitor {
           op,
           left: result,
           right,
+          loc: makeLoc(firstToken(ctx, ['primaryExpr']), firstToken(ctx, ['primaryExpr'])),
         };
       }
     }
@@ -439,66 +586,22 @@ class PokeCstVisitor extends BaseCstVisitor {
       type: 'CallExpr',
       name,
       args: [arg],
+      loc: makeLoc(firstToken(ctx, ['SpecialMirarRadar', 'SpecialDevolverALaBall']), firstToken(ctx, ['RParen'])),
     };
   }
 
   primaryExpr(ctx: any): ExprNode {
-    if (ctx.Float) {
-      return {
-        type: 'Literal',
-        value: parseFloat(ctx.Float[0].image),
-        valueType: 'float',
-      };
-    }
-    if (ctx.Int) {
-      return {
-        type: 'Literal',
-        value: parseInt(ctx.Int[0].image, 10),
-        valueType: 'int',
-      };
-    }
-    if (ctx.String) {
-      return {
-        type: 'Literal',
-        value: ctx.String[0].image.slice(1, -1),
-        valueType: 'string',
-      };
+    if (ctx.Float) return buildLiteralExpr('float', ctx.Float[0]);
+    if (ctx.Int) return buildLiteralExpr('int', ctx.Int[0]);
+    if (ctx.String) return buildLiteralExpr('string', ctx.String[0]);
+    // Identifier (possibly a call) should be handled before parenthesized expr
+    if (ctx.specialCallExpr) return this.visit(ctx.specialCallExpr[0]);
+    if (ctx.Identifier) {
+      const name = ctx.Identifier[0].image;
+      return buildIdentifierOrCallExpr(ctx, name);
     }
     if (ctx.LParen) {
       return this.visit(ctx.expr[0]);
-    }
-    if (ctx.specialCallExpr) {
-      return this.visit(ctx.specialCallExpr[0]);
-    }
-    if (ctx.Identifier) {
-      const name = ctx.Identifier[0].image;
-      if (ctx.LBracket) {
-        const index = this.visit(ctx.expr[0]);
-        return {
-          type: 'LValueExpr',
-          lvalue: {
-            type: 'IndexLValue',
-            name,
-            index,
-          },
-        };
-      }
-      if (ctx.expr && ctx.expr.length > 0) {
-        const args = ctx.expr ? ctx.expr.map((e: any) => this.visit(e)) : [];
-        return {
-          type: 'CallExpr',
-          name,
-          args,
-        };
-      } else {
-        return {
-          type: 'LValueExpr',
-          lvalue: {
-            type: 'IdentifierLValue',
-            name,
-          },
-        };
-      }
     }
     throw new Error('Unknown primary expression');
   }

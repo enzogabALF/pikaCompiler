@@ -28,12 +28,35 @@ pnpm install
 
 Esto instala el workspace completo y deja listo el lockfile de pnpm.
 
+Si vas a trabajar solo dentro de `web/`, también puedes preparar ese paquete con:
+
+```bash
+pnpm --dir web install
+```
+
 ## Activar hooks locales
 
 Los hooks de Husky quedan preparados al instalar dependencias. Si necesitas reactivarlos manualmente:
 
 ```bash
 pnpm --dir web run prepare
+```
+
+## Entorno de desarrollo
+
+Usa estos comandos para el flujo diario:
+
+```bash
+pnpm dev
+pnpm test
+pnpm lint
+```
+
+Si quieres trabajar solo sobre el frontend:
+
+```bash
+pnpm --dir web dev
+pnpm --dir web test src/compiler/lexer.test.ts
 ```
 
 ## Levantar el proyecto

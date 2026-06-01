@@ -14,7 +14,7 @@ Implementado hoy:
 Pendiente:
 - Análisis semántico completo.
 - IR y optimización.
-- Generación de código o intérprete.
+- Generación de código o intérprete avanzado.
 
 ## Estructura relevante
 
@@ -26,6 +26,8 @@ Pendiente:
 
 ## Arranque rápido
 
+Desde la raíz del repositorio:
+
 ```bash
 pnpm install
 pnpm dev
@@ -34,7 +36,20 @@ pnpm dev
 Si prefieres abrir solo la app web directamente:
 
 ```bash
+pnpm --dir web install
 pnpm --dir web dev
+```
+
+Para dejar listos los hooks locales de Husky en el paquete web:
+
+```bash
+pnpm --dir web run prepare
+```
+
+Para ejecutar pruebas del lexer y del compilador:
+
+```bash
+pnpm --dir web test
 ```
 
 ## Formatos y calidad

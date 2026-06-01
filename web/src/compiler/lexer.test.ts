@@ -26,6 +26,17 @@ describe('poke lexer', () => {
     ]);
   });
 
+  it('distingue palabras reservadas completas de identificadores parecidos', () => {
+    const names = tokenNames('MOVIMIENTOx PokeBall_1 RETORNAR CAPTURA_');
+
+    expect(names).toEqual([
+      TokenNames.Identifier,
+      TokenNames.Identifier,
+      TokenNames.Identifier,
+      TokenNames.Identifier,
+    ]);
+  });
+
   it('tokeniza números flotantes, operadores y comentarios', () => {
     const result = tokenizePokeCode('1 + 2.5 // suma\n/* bloque */ - 3');
 
@@ -36,6 +47,28 @@ describe('poke lexer', () => {
       TokenNames.Float,
       TokenNames.Minus,
       TokenNames.Int,
+    ]);
+  });
+
+  it('tokeniza operadores relacionales y de igualdad', () => {
+    const names = tokenNames('a <= b >= c == d != e < f > g = h');
+
+    expect(names).toEqual([
+      TokenNames.Identifier,
+      TokenNames.LessEqual,
+      TokenNames.Identifier,
+      TokenNames.GreaterEqual,
+      TokenNames.Identifier,
+      TokenNames.Equal,
+      TokenNames.Identifier,
+      TokenNames.NotEqual,
+      TokenNames.Identifier,
+      TokenNames.LessThan,
+      TokenNames.Identifier,
+      TokenNames.GreaterThan,
+      TokenNames.Identifier,
+      TokenNames.Assign,
+      TokenNames.Identifier,
     ]);
   });
 
@@ -50,6 +83,27 @@ describe('poke lexer', () => {
       TokenNames.KeywordCon,
       TokenNames.String,
       TokenNames.Semicolon,
+    ]);
+  });
+
+  it('reconoce símbolos temáticos de lista, estructura y especiales', () => {
+    const names = tokenNames('MOCHILA [x, y]: EQUIPO DE 3 RADAR APUNTA_A MIRAR_RADAR DEVOLVER_A_LA_BALL');
+
+    expect(names).toEqual([
+      TokenNames.KeywordMochila,
+      TokenNames.LBracket,
+      TokenNames.Identifier,
+      TokenNames.Comma,
+      TokenNames.Identifier,
+      TokenNames.RBracket,
+      TokenNames.Colon,
+      TokenNames.KeywordEquipo,
+      TokenNames.KeywordDe,
+      TokenNames.Int,
+      TokenNames.KeywordRadar,
+      TokenNames.KeywordApuntaA,
+      TokenNames.SpecialMirarRadar,
+      TokenNames.SpecialDevolverALaBall,
     ]);
   });
 });

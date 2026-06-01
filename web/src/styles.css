@@ -4,6 +4,26 @@ body,
   height: 100%;
   margin: 0;
 }
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+}
+
+.editor-pane {
+  flex: 1;
+}
+
+.console-pane {
+  width: 420px;
+  border-left: 1px solid #ddd;
+  padding: 8px;
+}
+
+.console-output {
+  white-space: pre-wrap;
+}
+
 pre {
   font-family: monospace;
 }
