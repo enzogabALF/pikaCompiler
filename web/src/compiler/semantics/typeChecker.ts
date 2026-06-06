@@ -41,6 +41,12 @@ function walkExpr(expr: ExprNode, checkVar: (name: string, loc?: SourceLocation)
     case 'LValueExpr':
       walkLValue(expr.lvalue, checkVar);
       return;
+    case 'MochilaSacar':
+      checkVar(expr.mochilaName, locFrom(expr));
+      return;
+    case 'MochilaCantidadDe':
+      checkVar(expr.mochilaName, locFrom(expr));
+      return;
     case 'Literal':
       return;
   }
@@ -152,6 +158,63 @@ function checkCallStmt(
   for (const arg of stmt.args || []) walkExpr(arg, checkVar);
 }
 
+function areTypesCompatible(varType: string, valType: string): boolean {
+  const mapping: Record<string, string> = {
+    PokeBall: 'int',
+    SuperBall: 'float',
+    UltraBall: 'string',
+    MasterBall: 'bool',
+    int: 'int',
+    float: 'float',
+    string: 'string',
+    bool: 'bool',
+  };
+  return mapping[varType] === mapping[valType];
+}
+
+function validateExpr(
+  expr: ExprNode | undefined,
+  fnName: string,
+  fnTable: FunctionScope,
+  errors: SemanticDiagnostic[]
+) {
+  if (!expr) return;
+  switch (expr.type) {
+    case 'MochilaSacar': {
+      const info = fnTable.lookupVar(expr.mochilaName);
+      if (info && !info.isMochila) {
+        errors.push(
+          makeError(`Symbol '${expr.mochilaName}' is not a MOCHILA in ${fnName}`, locFrom(expr))
+        );
+      }
+      break;
+    }
+    case 'MochilaCantidadDe': {
+      const info = fnTable.lookupVar(expr.mochilaName);
+      if (info && !info.isMochila) {
+        errors.push(
+          makeError(`Symbol '${expr.mochilaName}' is not a MOCHILA in ${fnName}`, locFrom(expr))
+        );
+      }
+      break;
+    }
+    case 'BinOp':
+      validateExpr(expr.left, fnName, fnTable, errors);
+      validateExpr(expr.right, fnName, fnTable, errors);
+      break;
+    case 'CallExpr':
+      for (const arg of expr.args || []) validateExpr(arg, fnName, fnTable, errors);
+      break;
+    case 'LValueExpr':
+      if (expr.lvalue.type === 'IndexLValue') {
+        validateExpr(expr.lvalue.index, fnName, fnTable, errors);
+      } else if (expr.lvalue.type === 'SpecialLValue') {
+        validateExpr(expr.lvalue.arg, fnName, fnTable, errors);
+      }
+      break;
+  }
+}
+
 function checkStatementList(
   statements: StatementNode[] | undefined,
   fnName: string,
@@ -167,17 +230,20 @@ function checkStatementList(
     switch (stmt.type) {
       case 'CallStmt':
         checkCallStmt(stmt, fnName, checkVar, global, errors);
+        for (const arg of stmt.args || []) validateExpr(arg, fnName, fnTable, errors);
         break;
       case 'AssignmentStmt':
         validateLValue(stmt.lvalue, fnName, fnTable, global, errors);
         walkExpr(stmt.value, checkVar);
+        validateExpr(stmt.value, fnName, fnTable, errors);
         break;
       case 'CaptureDecl':
         walkExpr(stmt.value, checkVar);
+        validateExpr(stmt.value, fnName, fnTable, errors);
         break;
       case 'EquipoDecl':
-        // validate capacity expression and known literal bounds
         walkExpr(stmt.capacity, checkVar);
+        validateExpr(stmt.capacity, fnName, fnTable, errors);
         if ((stmt as any).capacity && (stmt as any).capacity.type === 'Literal') {
           const capNode = (stmt as any).capacity as any;
           if (capNode.valueType === 'int') {
@@ -201,17 +267,48 @@ function checkStatementList(
           }
         }
         break;
+      case 'MochilaGuardar': {
+        const varInfo = fnTable.lookupVar(stmt.name);
+        if (!varInfo) {
+          errors.push(
+            makeError(`Use of undefined symbol '${stmt.name}' in ${fnName}`, locFrom(stmt))
+          );
+        } else if (!varInfo.isMochila) {
+          errors.push(
+            makeError(`Symbol '${stmt.name}' is not a MOCHILA in ${fnName}`, locFrom(stmt))
+          );
+        } else if (varInfo.typeName && stmt.value.type === 'Literal') {
+          if (!areTypesCompatible(varInfo.typeName, (stmt.value as any).valueType)) {
+            errors.push(
+              makeError(
+                `Type mismatch: cannot push value of type '${
+                  (stmt.value as any).valueType
+                }' to MOCHILA of type '${varInfo.typeName}' in ${fnName}`,
+                locFrom(stmt)
+              )
+            );
+          }
+        }
+        walkExpr(stmt.value, checkVar);
+        validateExpr(stmt.value, fnName, fnTable, errors);
+        break;
+      }
       case 'IfStmt':
         walkExpr(stmt.test, checkVar);
+        validateExpr(stmt.test, fnName, fnTable, errors);
         checkStatementList(stmt.consequent, fnName, fnTable, global, errors);
         checkStatementList(stmt.alternate, fnName, fnTable, global, errors);
         break;
       case 'WhileStmt':
         walkExpr(stmt.test, checkVar);
+        validateExpr(stmt.test, fnName, fnTable, errors);
         checkStatementList(stmt.body, fnName, fnTable, global, errors);
         break;
       case 'ReturnStmt':
-        if (stmt.value) walkExpr(stmt.value, checkVar);
+        if (stmt.value) {
+          walkExpr(stmt.value, checkVar);
+          validateExpr(stmt.value, fnName, fnTable, errors);
+        }
         break;
       case 'MochilaDecl':
       case 'RadarDecl':

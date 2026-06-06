@@ -49,6 +49,7 @@ export type StatementNode =
   | EquipoDeclNode
   | MochilaDeclNode
   | RadarDeclNode
+  | MochilaGuardarNode
   | IfStmtNode
   | WhileStmtNode
   | AssignmentStmtNode
@@ -59,6 +60,13 @@ export interface CaptureDeclNode {
   type: 'CaptureDecl';
   name: string;
   typeName: string;
+  value: ExprNode;
+  loc?: SourceLocation;
+}
+
+export interface MochilaGuardarNode {
+  type: 'MochilaGuardar';
+  name: string;
   value: ExprNode;
   loc?: SourceLocation;
 }
@@ -120,12 +128,31 @@ export interface ReturnStmtNode {
   loc?: SourceLocation;
 }
 
-export type ExprNode = LiteralNode | IdentifierNode | BinOpNode | CallExprNode | LValueExprNode;
+export type ExprNode =
+  | LiteralNode
+  | IdentifierNode
+  | BinOpNode
+  | CallExprNode
+  | LValueExprNode
+  | MochilaSacarNode
+  | MochilaCantidadDeNode;
 
 export interface LiteralNode {
   type: 'Literal';
   value: number | string | boolean;
   valueType: 'int' | 'float' | 'string' | 'bool';
+  loc?: SourceLocation;
+}
+
+export interface MochilaSacarNode {
+  type: 'MochilaSacar';
+  mochilaName: string;
+  loc?: SourceLocation;
+}
+
+export interface MochilaCantidadDeNode {
+  type: 'MochilaCantidadDe';
+  mochilaName: string;
   loc?: SourceLocation;
 }
 
@@ -374,12 +401,24 @@ class PokeCstVisitor extends BaseCstVisitor {
       ctx.equipoDecl ||
       ctx.mochilaDecl ||
       ctx.radarDecl ||
+      ctx.mochilaGuardarStmt ||
       ctx.ifStmt ||
       ctx.whileStmt ||
       ctx.returnStmt ||
       ctx.specialAssignmentStmt ||
       ctx.assignOrCallStmt;
     return this.visit(child[0]);
+  }
+
+  mochilaGuardarStmt(ctx: any): MochilaGuardarNode {
+    const name = ctx.Identifier[0].image;
+    const value = this.visit(ctx.expr[0]);
+    return {
+      type: 'MochilaGuardar',
+      name,
+      value,
+      loc: makeLoc(firstToken(ctx, ['SpecialMochilaGuardar']), firstToken(ctx, ['Semicolon'])),
+    };
   }
 
   captureDecl(ctx: any): CaptureDeclNode {
@@ -609,12 +648,38 @@ class PokeCstVisitor extends BaseCstVisitor {
     };
   }
 
+  mochilaSacarExpr(ctx: any): MochilaSacarNode {
+    const mochilaExpr = this.visit(ctx.expr[0]);
+    if (mochilaExpr.type !== 'LValueExpr' || mochilaExpr.lvalue.type !== 'IdentifierLValue') {
+      throw new Error('SACAR must receive a Mochila variable name');
+    }
+    return {
+      type: 'MochilaSacar',
+      mochilaName: mochilaExpr.lvalue.name,
+      loc: makeLoc(firstToken(ctx, ['SpecialMochilaSacar']), firstToken(ctx, ['RParen'])),
+    };
+  }
+
+  mochilaCantidadDeExpr(ctx: any): MochilaCantidadDeNode {
+    const mochilaExpr = this.visit(ctx.expr[0]);
+    if (mochilaExpr.type !== 'LValueExpr' || mochilaExpr.lvalue.type !== 'IdentifierLValue') {
+      throw new Error('CANTIDAD_DE must receive a Mochila variable name');
+    }
+    return {
+      type: 'MochilaCantidadDe',
+      mochilaName: mochilaExpr.lvalue.name,
+      loc: makeLoc(firstToken(ctx, ['SpecialMochilaCantidadDe']), firstToken(ctx, ['RParen'])),
+    };
+  }
+
   primaryExpr(ctx: any): ExprNode {
     if (ctx.Float) return buildLiteralExpr('float', ctx.Float[0]);
     if (ctx.Int) return buildLiteralExpr('int', ctx.Int[0]);
     if (ctx.String) return buildLiteralExpr('string', ctx.String[0]);
     // Identifier (possibly a call) should be handled before parenthesized expr
     if (ctx.specialCallExpr) return this.visit(ctx.specialCallExpr[0]);
+    if (ctx.mochilaSacarExpr) return this.visit(ctx.mochilaSacarExpr[0]);
+    if (ctx.mochilaCantidadDeExpr) return this.visit(ctx.mochilaCantidadDeExpr[0]);
     if (ctx.Identifier) {
       const name = ctx.Identifier[0].image;
       return buildIdentifierOrCallExpr(ctx, name);

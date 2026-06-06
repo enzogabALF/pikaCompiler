@@ -173,4 +173,38 @@ describe('semantics - symbol table', () => {
       startColumn: 9,
     });
   });
+
+  it('checks semantic correctness of Mochila operations', () => {
+    // Valid mochila program
+    const validProgram = parseProgram(`
+      PUEBLO_NATAL() {
+        MOCHILA mochila DE PokeBall;
+        GUARDAR(mochila, 10);
+        CAPTURA x EN PokeBall CON SACAR(mochila);
+        CAPTURA qty EN PokeBall CON CANTIDAD_DE(mochila);
+      }
+    `);
+    const validErrors = typeCheck(validProgram);
+    expect(validErrors).toHaveLength(0);
+
+    // Invalid: GUARDAR on non-mochila variable
+    const invalidProgram1 = parseProgram(`
+      PUEBLO_NATAL() {
+        CAPTURA no_mochila EN PokeBall CON 5;
+        GUARDAR(no_mochila, 10);
+      }
+    `);
+    const errors1 = typeCheck(invalidProgram1);
+    expect(errors1.some((e) => e.message.includes('is not a MOCHILA'))).toBe(true);
+
+    // Invalid: Type mismatch on GUARDAR
+    const invalidProgram2 = parseProgram(`
+      PUEBLO_NATAL() {
+        MOCHILA mochila DE UltraBall;
+        GUARDAR(mochila, 10);
+      }
+    `);
+    const errors2 = typeCheck(invalidProgram2);
+    expect(errors2.some((e) => e.message.includes('Type mismatch'))).toBe(true);
+  });
 });

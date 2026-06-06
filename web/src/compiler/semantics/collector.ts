@@ -27,7 +27,7 @@ export function collectSymbols(program: ProgramNode) {
         fnTable.defineVar({ name: s.name, typeName: s.typeName, capacity: cap });
       } else if ((stmt as any).type === 'MochilaDecl') {
         const s = stmt as any;
-        fnTable.defineVar({ name: s.name, typeName: s.typeName });
+        fnTable.defineVar({ name: s.name, typeName: s.typeName, isMochila: true });
       } else if ((stmt as any).type === 'RadarDecl') {
         const s = stmt as any;
         fnTable.defineVar({ name: s.name, typeName: s.typeName });

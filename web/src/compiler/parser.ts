@@ -30,6 +30,9 @@ import {
   MientrasTengaPs,
   MirarRadar,
   DevolverALaBall,
+  MochilaGuardar,
+  MochilaSacar,
+  MochilaCantidadDe,
   Assign,
   LBracket,
   RBracket,
@@ -59,6 +62,9 @@ export class PokeParser extends CstParser {
   public equipoDecl!: any;
   public mochilaDecl!: any;
   public radarDecl!: any;
+  public mochilaGuardarStmt!: any;
+  public mochilaSacarExpr!: any;
+  public mochilaCantidadDeExpr!: any;
   public ifStmt!: any;
   public whileStmt!: any;
   public returnStmt!: any;
@@ -135,6 +141,7 @@ export class PokeParser extends CstParser {
         { ALT: () => $.SUBRULE($.equipoDecl) },
         { ALT: () => $.SUBRULE($.mochilaDecl) },
         { ALT: () => $.SUBRULE($.radarDecl) },
+        { ALT: () => $.SUBRULE($.mochilaGuardarStmt) },
         { ALT: () => $.SUBRULE($.ifStmt) },
         { ALT: () => $.SUBRULE($.whileStmt) },
         { ALT: () => $.SUBRULE($.returnStmt) },
@@ -168,6 +175,16 @@ export class PokeParser extends CstParser {
       $.CONSUME(Identifier);
       $.CONSUME(De);
       $.SUBRULE($.typeName);
+      $.CONSUME(Semicolon);
+    });
+
+    $.RULE('mochilaGuardarStmt', () => {
+      $.CONSUME(MochilaGuardar);
+      $.CONSUME(LParen);
+      $.CONSUME(Identifier);
+      $.CONSUME(Comma);
+      $.SUBRULE($.expr);
+      $.CONSUME(RParen);
       $.CONSUME(Semicolon);
     });
 
@@ -304,6 +321,20 @@ export class PokeParser extends CstParser {
       $.CONSUME(RParen);
     });
 
+    $.RULE('mochilaSacarExpr', () => {
+      $.CONSUME(MochilaSacar);
+      $.CONSUME(LParen);
+      $.SUBRULE($.expr);
+      $.CONSUME(RParen);
+    });
+
+    $.RULE('mochilaCantidadDeExpr', () => {
+      $.CONSUME(MochilaCantidadDe);
+      $.CONSUME(LParen);
+      $.SUBRULE($.expr);
+      $.CONSUME(RParen);
+    });
+
     $.RULE('primaryExpr', () => {
       $.OR([
         { ALT: () => $.CONSUME(Float) },
@@ -317,6 +348,8 @@ export class PokeParser extends CstParser {
           },
         },
         { ALT: () => $.SUBRULE($.specialCallExpr) },
+        { ALT: () => $.SUBRULE($.mochilaSacarExpr) },
+        { ALT: () => $.SUBRULE($.mochilaCantidadDeExpr) },
         {
           ALT: () => {
             $.CONSUME(Identifier);

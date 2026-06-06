@@ -311,6 +311,22 @@ function evaluateExpr(expr: ExprNode, env: RuntimeEnv, context: ExecutionContext
         case '[]':
           throw new InterpreterError('Indexing is handled as an lvalue', expr.loc);
       }
+      break;
+    }
+    case 'MochilaSacar': {
+      const target = getValue(env, expr.mochilaName, expr.loc);
+      if (!isArrayValue(target)) {
+        throw new InterpreterError(`Variable '${expr.mochilaName}' is not a MOCHILA`, expr.loc);
+      }
+      const popped = target.elements.pop();
+      return popped ?? null;
+    }
+    case 'MochilaCantidadDe': {
+      const target = getValue(env, expr.mochilaName, expr.loc);
+      if (!isArrayValue(target)) {
+        throw new InterpreterError(`Variable '${expr.mochilaName}' is not a MOCHILA`, expr.loc);
+      }
+      return target.elements.length;
     }
   }
 }
@@ -385,6 +401,14 @@ function executeStatement(
     }
     case 'ReturnStmt':
       return new ReturnSignal(stmt.value ? evaluateExpr(stmt.value, env, context) : null);
+    case 'MochilaGuardar': {
+      const target = getValue(env, stmt.name, stmt.loc);
+      if (!isArrayValue(target)) {
+        throw new InterpreterError(`Variable '${stmt.name}' is not a MOCHILA`, stmt.loc);
+      }
+      target.elements.push(evaluateExpr(stmt.value, env, context));
+      return undefined;
+    }
   }
 }
 

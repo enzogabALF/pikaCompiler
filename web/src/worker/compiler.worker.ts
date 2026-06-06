@@ -4,6 +4,7 @@ import { parser } from '../compiler/parser';
 import { tokenizePokeCode } from '../compiler/lexer';
 import { typeCheck } from '../compiler/semantics/typeChecker';
 import { executeProgram } from '../compiler/interpreter';
+import { compileIRToJS } from '../compiler/codegen';
 
 type Diagnostic = {
   message: string;
@@ -73,10 +74,6 @@ onmessage = (e) => {
 
   try {
     const ast = cstToAst(cst);
-    const ir = lowerProgramToIR(ast);
-    const optimizedIr = optimizeIR(ir);
-    const execution = executeProgram(ast);
-
     const semErrors = typeCheck(ast);
     if (semErrors.length) {
       postMessage({
@@ -94,21 +91,31 @@ onmessage = (e) => {
       return;
     }
 
+    const ir = lowerProgramToIR(ast);
+    const optimizedIr = optimizeIR(ir);
+    const compiledJS = compileIRToJS(optimizedIr);
+
+    const execution = executeProgram(ast);
+
+    let jsExecutionError: string | null = null;
+    let jsExecutionResult: any = null;
+    try {
+      const runFn = new Function(`${compiledJS}\nreturn runCompiledProgram();`);
+      jsExecutionResult = runFn();
+    } catch (err: any) {
+      jsExecutionError = err?.message ?? String(err);
+    }
+
     postMessage({
       type: 'result',
-      text:
-        'Parsed OK!\n\n--- AST GENERADO ---\n' +
-        JSON.stringify(ast, null, 2) +
-        '\n\n--- IR GENERADO ---\n' +
-        JSON.stringify(ir, null, 2) +
-        '\n\n--- IR OPTIMIZADO (Constant Folding) ---\n' +
-        JSON.stringify(optimizedIr, null, 2) +
-        '\n\n--- EJECUCIÓN ---\n' +
-        `Entrada: ${execution.entryFunction || 'sin entrada'}\n` +
-        `Retorno: ${String(execution.returnValue)}\n` +
-        (execution.output.length ? execution.output.join('\n') : 'Sin salida.'),
       ast,
-    });
+      ir,
+      optimizedIr,
+      compiledJS,
+      jsExecutionResult,
+      jsExecutionError,
+      execution,
+    } as any);
   } catch (err: any) {
     postMessage({
       type: 'errors',

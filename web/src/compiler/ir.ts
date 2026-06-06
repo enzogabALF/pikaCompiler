@@ -34,7 +34,15 @@ export type IRStatement =
   | IRCallStmt
   | IRIfStmt
   | IRWhileStmt
-  | IRReturnStmt;
+  | IRReturnStmt
+  | IRMochilaPush;
+
+export interface IRMochilaPush {
+  type: 'IRMochilaPush';
+  name: string;
+  value: IRExpr;
+  loc?: SourceLocation;
+}
 
 export interface IRDeclareStmt {
   type: 'IRDeclare';
@@ -80,7 +88,26 @@ export interface IRReturnStmt {
   loc?: SourceLocation;
 }
 
-export type IRExpr = IRLiteral | IRIdentifier | IRBinary | IRCallExpr | IRLValueExpr;
+export type IRExpr =
+  | IRLiteral
+  | IRIdentifier
+  | IRBinary
+  | IRCallExpr
+  | IRLValueExpr
+  | IRMochilaPop
+  | IRMochilaLength;
+
+export interface IRMochilaPop {
+  type: 'IRMochilaPop';
+  mochilaName: string;
+  loc?: SourceLocation;
+}
+
+export interface IRMochilaLength {
+  type: 'IRMochilaLength';
+  mochilaName: string;
+  loc?: SourceLocation;
+}
 
 export interface IRLiteral {
   type: 'IRLiteral';
@@ -172,6 +199,18 @@ function lowerExpr(expr: ExprNode): IRExpr {
       return {
         type: 'IRLValueExpr',
         target: lowerLValue(expr.lvalue),
+        loc: expr.loc,
+      };
+    case 'MochilaSacar':
+      return {
+        type: 'IRMochilaPop',
+        mochilaName: expr.mochilaName,
+        loc: expr.loc,
+      };
+    case 'MochilaCantidadDe':
+      return {
+        type: 'IRMochilaLength',
+        mochilaName: expr.mochilaName,
         loc: expr.loc,
       };
   }
@@ -269,6 +308,13 @@ function lowerStmt(stmt: StatementNode): IRStatement {
         value: stmt.value ? lowerExpr(stmt.value) : undefined,
         loc: stmt.loc,
       };
+    case 'MochilaGuardar':
+      return {
+        type: 'IRMochilaPush',
+        name: stmt.name,
+        value: lowerExpr(stmt.value),
+        loc: stmt.loc,
+      };
   }
 }
 
@@ -330,6 +376,26 @@ export function optimizeExpr(expr: IRExpr): IRExpr {
           }
         }
       }
+
+      // Algebraic Simplifications
+      if (expr.op === '+') {
+        if (left.type === 'IRLiteral' && left.value === 0) return right;
+        if (right.type === 'IRLiteral' && right.value === 0) return left;
+      }
+      if (expr.op === '-') {
+        if (right.type === 'IRLiteral' && right.value === 0) return left;
+      }
+      if (expr.op === '*') {
+        if (left.type === 'IRLiteral' && left.value === 1) return right;
+        if (right.type === 'IRLiteral' && right.value === 1) return left;
+        if (left.type === 'IRLiteral' && left.value === 0) {
+          return { type: 'IRLiteral', value: 0, valueType: left.valueType, loc: expr.loc };
+        }
+        if (right.type === 'IRLiteral' && right.value === 0) {
+          return { type: 'IRLiteral', value: 0, valueType: right.valueType, loc: expr.loc };
+        }
+      }
+
       return { ...expr, left, right };
     }
     case 'IRCallExpr': {
@@ -366,20 +432,51 @@ export function optimizeStmt(stmt: IRStatement): IRStatement {
       return {
         type: 'IRIf',
         test: optimizeExpr(stmt.test),
-        consequent: stmt.consequent.map(optimizeStmt),
-        alternate: stmt.alternate?.map(optimizeStmt),
+        consequent: optimizeStmtList(stmt.consequent),
+        alternate: stmt.alternate ? optimizeStmtList(stmt.alternate) : undefined,
         loc: stmt.loc,
       };
     case 'IRWhile':
       return {
         type: 'IRWhile',
         test: optimizeExpr(stmt.test),
-        body: stmt.body.map(optimizeStmt),
+        body: optimizeStmtList(stmt.body),
         loc: stmt.loc,
       };
     case 'IRReturn':
       return stmt.value ? { ...stmt, value: optimizeExpr(stmt.value) } : stmt;
+    case 'IRMochilaPush':
+      return {
+        type: 'IRMochilaPush',
+        name: stmt.name,
+        value: optimizeExpr(stmt.value),
+        loc: stmt.loc,
+      };
   }
+}
+
+export function optimizeStmtList(stmts: IRStatement[]): IRStatement[] {
+  const result: IRStatement[] = [];
+  for (const stmt of stmts) {
+    const optimized = optimizeStmt(stmt);
+    if (
+      optimized.type === 'IRIf' &&
+      optimized.test.type === 'IRLiteral' &&
+      optimized.test.valueType === 'bool'
+    ) {
+      const cond = optimized.test.value;
+      if (cond === true) {
+        result.push(...optimized.consequent);
+      } else if (cond === false) {
+        if (optimized.alternate) {
+          result.push(...optimized.alternate);
+        }
+      }
+    } else {
+      result.push(optimized);
+    }
+  }
+  return result;
 }
 
 export function optimizeIR(program: IRProgram): IRProgram {
@@ -387,7 +484,7 @@ export function optimizeIR(program: IRProgram): IRProgram {
     type: 'IRProgram',
     functions: program.functions.map((fn) => ({
       ...fn,
-      body: fn.body.map(optimizeStmt),
+      body: optimizeStmtList(fn.body),
     })),
   };
 }

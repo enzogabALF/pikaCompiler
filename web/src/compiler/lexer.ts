@@ -48,6 +48,9 @@ export const TokenNames = {
   KeywordMasterBall: 'KeywordMasterBall',
   SpecialMirarRadar: 'SpecialMirarRadar',
   SpecialDevolverALaBall: 'SpecialDevolverALaBall',
+  SpecialMochilaGuardar: 'SpecialMochilaGuardar',
+  SpecialMochilaSacar: 'SpecialMochilaSacar',
+  SpecialMochilaCantidadDe: 'SpecialMochilaCantidadDe',
 } as const;
 
 export const WhiteSpace = createToken({
@@ -156,6 +159,18 @@ export const DevolverALaBall = createToken({
   name: TokenNames.SpecialDevolverALaBall,
   pattern: /DEVOLVER_A_LA_BALL\b/,
 });
+export const MochilaGuardar = createToken({
+  name: TokenNames.SpecialMochilaGuardar,
+  pattern: /GUARDAR\b/,
+});
+export const MochilaSacar = createToken({
+  name: TokenNames.SpecialMochilaSacar,
+  pattern: /SACAR\b/,
+});
+export const MochilaCantidadDe = createToken({
+  name: TokenNames.SpecialMochilaCantidadDe,
+  pattern: /CANTIDAD_DE\b/,
+});
 
 export const LParen = createToken({ name: TokenNames.LParen, pattern: /\(/ });
 export const RParen = createToken({ name: TokenNames.RParen, pattern: /\)/ });
@@ -210,6 +225,9 @@ export const allTokens = [
   KeywordMasterBall,
   MirarRadar,
   DevolverALaBall,
+  MochilaGuardar,
+  MochilaSacar,
+  MochilaCantidadDe,
   LessEqual,
   GreaterEqual,
   Equal,

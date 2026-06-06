@@ -230,4 +230,46 @@ describe('PokeLang Lexer, Parser and AST', () => {
       },
     ]);
   });
+
+  it('should parse Mochila operations: GUARDAR, SACAR and CANTIDAD_DE', () => {
+    const code = `
+      PUEBLO_NATAL() {
+        MOCHILA items DE PokeBall;
+        GUARDAR(items, 10);
+        CAPTURA item EN PokeBall CON SACAR(items);
+        CAPTURA qty EN PokeBall CON CANTIDAD_DE(items);
+      }
+    `;
+    const ast = parseAndAst(code);
+    expect(ast.functions[0].body).toMatchObject([
+      {
+        type: 'MochilaDecl',
+        name: 'items',
+        typeName: 'PokeBall',
+      },
+      {
+        type: 'MochilaGuardar',
+        name: 'items',
+        value: { type: 'Literal', value: 10 },
+      },
+      {
+        type: 'CaptureDecl',
+        name: 'item',
+        typeName: 'PokeBall',
+        value: {
+          type: 'MochilaSacar',
+          mochilaName: 'items',
+        },
+      },
+      {
+        type: 'CaptureDecl',
+        name: 'qty',
+        typeName: 'PokeBall',
+        value: {
+          type: 'MochilaCantidadDe',
+          mochilaName: 'items',
+        },
+      },
+    ]);
+  });
 });
