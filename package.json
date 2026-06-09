@@ -9,12 +9,16 @@
     "test": "turbo run test --filter=pika-compiler-web",
     "lint": "turbo run lint --filter=pika-compiler-web",
     "format": "turbo run format --filter=pika-compiler-web",
-    "commit": "node ./scripts/commit-wrapper.js"
+    "commit": "node ./scripts/commit-wrapper.js",
+    "pika-compile": "ts-node bin/pika-compiler.ts"
   },
   "engines": {
     "node": ">=18 <19"
   },
   "devDependencies": {
-    "turbo": "2.9.16"
+    "turbo": "2.9.16",
+    "typescript": "5.2.2",
+    "ts-node": "10.9.2",
+    "@types/node": "18.17.0"
   }
 }

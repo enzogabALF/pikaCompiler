@@ -3,8 +3,7 @@ import { lowerProgramToIR, optimizeIR } from '../compiler/ir';
 import { parser } from '../compiler/parser';
 import { tokenizePokeCode } from '../compiler/lexer';
 import { typeCheck } from '../compiler/semantics/typeChecker';
-import { executeProgram } from '../compiler/interpreter';
-import { compileIRToJS } from '../compiler/codegen';
+import { compileIRToC } from '../compiler/codegen';
 
 type Diagnostic = {
   message: string;
@@ -93,28 +92,14 @@ onmessage = (e) => {
 
     const ir = lowerProgramToIR(ast);
     const optimizedIr = optimizeIR(ir);
-    const compiledJS = compileIRToJS(optimizedIr);
-
-    const execution = executeProgram(ast);
-
-    let jsExecutionError: string | null = null;
-    let jsExecutionResult: any = null;
-    try {
-      const runFn = new Function(`${compiledJS}\nreturn runCompiledProgram();`);
-      jsExecutionResult = runFn();
-    } catch (err: any) {
-      jsExecutionError = err?.message ?? String(err);
-    }
+    const compiledC = compileIRToC(optimizedIr);
 
     postMessage({
       type: 'result',
       ast,
       ir,
       optimizedIr,
-      compiledJS,
-      jsExecutionResult,
-      jsExecutionError,
-      execution,
+      compiledC,
     } as any);
   } catch (err: any) {
     postMessage({

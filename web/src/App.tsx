@@ -33,10 +33,7 @@ type WorkerMessage =
       ast: any;
       ir: any;
       optimizedIr: any;
-      compiledJS: string;
-      jsExecutionResult: any;
-      jsExecutionError: string | null;
-      execution: any;
+      compiledC: string;
     }
   | { type: 'errors'; errors: WorkerDiagnostic[] };
 
@@ -92,17 +89,14 @@ const TEMPLATE_RADAR = `PUEBLO_NATAL() {
 }`;
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'oak' | 'js' | 'details'>('oak');
+  const [activeTab, setActiveTab] = useState<'oak' | 'c' | 'details'>('oak');
   const [isSuccess, setIsSuccess] = useState(true);
   const [errors, setErrors] = useState<WorkerDiagnostic[]>([]);
   const [compiledData, setCompiledData] = useState<{
     ast: any;
     ir: any;
     optimizedIr: any;
-    compiledJS: string;
-    jsExecutionResult: any;
-    jsExecutionError: string | null;
-    execution: any;
+    compiledC: string;
   } | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
@@ -132,10 +126,7 @@ export default function App() {
           ast: msg.ast,
           ir: msg.ir,
           optimizedIr: msg.optimizedIr,
-          compiledJS: msg.compiledJS,
-          jsExecutionResult: msg.jsExecutionResult,
-          jsExecutionError: msg.jsExecutionError,
-          execution: msg.execution,
+          compiledC: msg.compiledC,
         });
         return;
       }
@@ -240,10 +231,10 @@ export default function App() {
               🗣️ Consola de Oak
             </button>
             <button
-              className={`tab-btn ${activeTab === 'js' ? 'active' : ''}`}
-              onClick={() => setActiveTab('js')}
+              className={`tab-btn ${activeTab === 'c' ? 'active' : ''}`}
+              onClick={() => setActiveTab('c')}
             >
-              ⚡ Código Objeto JS
+              ⚡ Código C Compilado
             </button>
             <button
               className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
@@ -263,15 +254,15 @@ export default function App() {
                   </div>
                   {isSuccess && compiledData ? (
                     <div className="dialog-text">
-                      {compiledData.execution.output.length > 0
-                        ? compiledData.execution.output.join('\n')
-                        : 'El programa corrió sin producir salida.'}
+                      {"¡Pika-Pika! El compilador ha traducido con éxito tu programa PokeCode a código C moderno (C11)."}
+                      <br /><br />
+                      {"Puedes explorar el código compilado resultante en la pestaña 'Código C Compilado' o ver las fases del compilador en 'Detalles del Compilador'."}
                     </div>
                   ) : (
                     <div className="dialog-text error">
                       {errors.length > 0
                         ? errors.map((err) => `[Línea ${err.line}] ${err.message}`).join('\n')
-                        : 'Error desconocido durante la compilación o ejecución.'}
+                        : 'Error de compilación. Por favor revisa los tipos y la sintaxis.'}
                     </div>
                   )}
                 </div>
@@ -279,26 +270,17 @@ export default function App() {
                 {isSuccess && compiledData && (
                   <>
                     <div className="result-metric">
-                      <span className="metric-label">Retorno Intérprete AST:</span>
-                      <span className="metric-value">
-                        {compiledData.execution.returnValue !== null
-                          ? String(compiledData.execution.returnValue)
-                          : 'sin retorno'}
-                      </span>
+                      <span className="metric-label">Fases del Compilador:</span>
+                      <span className="metric-value">6 / 6 COMPLETADAS</span>
                     </div>
                     <div className="result-metric">
-                      <span className="metric-label">Retorno Código Objeto JS:</span>
+                      <span className="metric-label">Optimización (CF & DCE):</span>
+                      <span className="metric-value" style={{ color: '#4caf50' }}>ACTIVA</span>
+                    </div>
+                    <div className="result-metric">
+                      <span className="metric-label">Líneas de Código C:</span>
                       <span className="metric-value">
-                        {compiledData.jsExecutionError ? (
-                          <span style={{ color: '#ff8080' }}>
-                            Error: {compiledData.jsExecutionError}
-                          </span>
-                        ) : compiledData.jsExecutionResult?.returnValue !== undefined &&
-                          compiledData.jsExecutionResult.returnValue !== null ? (
-                          String(compiledData.jsExecutionResult.returnValue)
-                        ) : (
-                          'sin retorno'
-                        )}
+                        {compiledData.compiledC.split('\n').length}
                       </span>
                     </div>
                   </>
@@ -306,9 +288,9 @@ export default function App() {
               </div>
             )}
 
-            {activeTab === 'js' && (
+            {activeTab === 'c' && (
               <pre className="code-output">
-                {isSuccess && compiledData ? compiledData.compiledJS : '// Sin código compilado.'}
+                {isSuccess && compiledData ? compiledData.compiledC : '// Sin código compilado.'}
               </pre>
             )}
 

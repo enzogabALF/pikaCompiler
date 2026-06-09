@@ -1,19 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700;900&family=Fira+Code:wght@400;600&display=swap');
 
 :root {
-  --primary-red: #e3350d;
-  --primary-dark: #12121a;
-  --card-bg: #1e1e2d;
-  --accent-yellow: #fdb913;
+  --primary-yellow: #fbd743;
+  --primary-red: #e63b2e;
+  --primary-brown: #583d29;
+  --primary-dark: #121216;
+  --card-bg: #1d1d24;
+  --accent-yellow: #f2c811;
   --accent-green: #4caf50;
-  --bg-main: #0a0a0f;
-  --border-color: #2b2b3d;
-  --text-main: #e2e8f0;
-  --text-muted: #94a3b8;
+  --bg-main: #0a0a0e;
+  --border-color: #2e2e3a;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
   --font-title: 'Press Start 2P', monospace;
   --font-sans: 'Outfit', sans-serif;
   --font-mono: 'Fira Code', monospace;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --border-radius: 12px;
 }
 
 * {
@@ -40,16 +43,16 @@ body {
   height: 100vh;
 }
 
-/* Header Pokédex */
+/* Header Pikachu-style */
 .header-bar {
-  background-color: var(--primary-red);
-  color: white;
-  padding: 12px 24px;
+  background-color: var(--primary-yellow);
+  color: var(--primary-dark);
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  border-bottom: 4px solid var(--primary-dark);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-bottom: 5px solid var(--primary-brown);
   position: relative;
   z-index: 10;
 }
@@ -62,40 +65,41 @@ body {
 
 .brand-title {
   font-family: var(--font-title);
-  font-size: 16px;
+  font-size: 18px;
   letter-spacing: 1.5px;
-  text-shadow: 2px 2px var(--primary-dark);
+  color: var(--primary-dark);
+  text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6);
 }
 
-/* CSS Pokeball Status Indicator */
+/* CSS Pikachu Status Indicator */
 .pokeball-indicator {
   display: flex;
   align-items: center;
   gap: 12px;
   background-color: var(--primary-dark);
-  padding: 6px 16px;
+  padding: 6px 18px;
   border-radius: 30px;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--primary-brown);
 }
 
 .pokeball-badge {
   width: 20px;
   height: 20px;
-  border: 2px solid white;
+  border: 2px solid #ffffff;
   border-radius: 50%;
-  background: linear-gradient(to bottom, #ff3838 50%, #ffffff 50%);
+  background: linear-gradient(to bottom, var(--primary-yellow) 50%, var(--primary-brown) 50%);
   position: relative;
   flex-shrink: 0;
 }
 
 .pokeball-badge.success {
-  animation: spin 3s linear infinite;
-  border-color: #a8ffb2;
+  animation: pulse-yellow 2s infinite alternate;
+  border-color: var(--primary-yellow);
 }
 
 .pokeball-badge.error {
   border-color: #ffb3b3;
-  background: linear-gradient(to bottom, #d32f2f 50%, #7d7d7d 50%);
+  background: linear-gradient(to bottom, var(--primary-red) 50%, var(--primary-dark) 50%);
 }
 
 .pokeball-badge::after {
@@ -118,7 +122,7 @@ body {
 }
 
 .status-text.success {
-  color: var(--accent-green);
+  color: var(--primary-yellow);
 }
 
 .status-text.error {
@@ -132,7 +136,7 @@ body {
   overflow: hidden;
   padding: 20px;
   gap: 20px;
-  background: radial-gradient(circle at top right, #1a1525 0%, #050508 100%);
+  background: radial-gradient(circle at top right, #201a10 0%, #050508 100%);
 }
 
 /* Panes */
@@ -161,7 +165,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 14px;
-  color: var(--accent-yellow);
+  color: var(--primary-yellow);
 }
 
 .editor-wrapper {
@@ -186,7 +190,7 @@ body {
 }
 
 .template-btn {
-  background: #2b2b3d;
+  background: #23232f;
   color: var(--text-main);
   border: 1px solid var(--border-color);
   padding: 6px 12px;
@@ -237,9 +241,9 @@ body {
 }
 
 .tab-btn.active {
-  color: var(--accent-yellow);
+  color: var(--primary-yellow);
   background-color: var(--card-bg);
-  box-shadow: inset 0 2px 0 var(--accent-yellow);
+  box-shadow: inset 0 2px 0 var(--primary-yellow);
 }
 
 /* Oak Dialogue Box Console */
@@ -257,8 +261,8 @@ body {
 }
 
 .dialog-box {
-  background: #14141f;
-  border: 4px double #5e5e80;
+  background: #15151b;
+  border: 4px double var(--primary-yellow);
   border-radius: 8px;
   padding: 16px;
   position: relative;
@@ -281,7 +285,7 @@ body {
 .dialog-title {
   font-family: var(--font-title);
   font-size: 8px;
-  color: var(--accent-yellow);
+  color: var(--primary-yellow);
 }
 
 .dialog-text {
@@ -299,7 +303,7 @@ body {
 }
 
 .result-metric {
-  background: #2b2b3d;
+  background: #23232f;
   border-radius: 8px;
   padding: 10px 14px;
   display: flex;
@@ -320,11 +324,11 @@ body {
 /* Code Output Tab */
 .code-output {
   font-family: var(--font-mono);
-  background: #12121a;
+  background: #0f0f14;
   border-radius: 8px;
   padding: 16px;
   border: 1px solid var(--border-color);
-  color: #38bdf8;
+  color: var(--primary-yellow);
   white-space: pre-wrap;
   height: 100%;
   overflow: auto;
@@ -340,7 +344,7 @@ body {
 }
 
 .details-card {
-  background: #14141f;
+  background: #15151b;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   overflow: hidden;
@@ -352,7 +356,7 @@ body {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--accent-yellow);
+  color: var(--primary-yellow);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -369,13 +373,16 @@ body {
   line-height: 1.4;
 }
 
-/* Spin animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+/* Animations */
+@keyframes pulse-yellow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(251, 215, 67, 0.7);
   }
-  to {
-    transform: rotate(360deg);
+  70% {
+    box-shadow: 0 0 0 10px rgba(251, 215, 67, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(251, 215, 67, 0);
   }
 }
 
@@ -388,9 +395,9 @@ body {
   background: var(--primary-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b2b3d;
+  background: #23232f;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-red);
+  background: var(--primary-yellow);
 }
