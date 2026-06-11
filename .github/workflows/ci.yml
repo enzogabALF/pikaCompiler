@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, '001-pokemon-compiler-language' ]
+    branches: [ master, '001-pokemon-compiler-language' ]
   pull_request:
-    branches: [ main, '001-pokemon-compiler-language' ]
+    branches: [ master, '001-pokemon-compiler-language' ]
 
 jobs:
   web-test:

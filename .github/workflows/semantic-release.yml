@@ -3,8 +3,7 @@ name: Semantic Release
 on:
   push:
     branches:
-      - main
-      - '001-pokemon-compiler-language'
+      - master
 
 jobs:
   release:
