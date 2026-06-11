@@ -118,7 +118,9 @@ function compileStmt(stmt: IRStatement, indent = '  '): string {
         return `${indent}${cType} ${stmt.name} = ${stmt.value ? compileExpr(stmt.value) : '0'};`;
       }
       if (stmt.kind === 'EQUIPO') {
-        return `${indent}${cType} ${stmt.name}[${stmt.value ? compileExpr(stmt.value) : '0'}] = {0};`;
+        return `${indent}${cType} ${stmt.name}[${
+          stmt.value ? compileExpr(stmt.value) : '0'
+        }] = {0};`;
       }
       if (stmt.kind === 'MOCHILA') {
         const suffix = getMochilaSuffix(stmt.typeName);
@@ -166,16 +168,18 @@ function compileStmt(stmt: IRStatement, indent = '  '): string {
 
 function compileFunc(fn: IRFunction): string {
   const isMain = fn.name === 'PUEBLO_NATAL';
-  const cRetType = isMain ? 'int' : (fn.returnType ? mapType(fn.returnType) : 'void');
+  const cRetType = isMain ? 'int' : fn.returnType ? mapType(fn.returnType) : 'void';
   const funcName = isMain ? 'main' : fn.name;
-  
-  const params = isMain ? 'void' : fn.params.map((p) => `${mapType(p.typeName)} ${p.name}`).join(', ');
-  
+
+  const params = isMain
+    ? 'void'
+    : fn.params.map((p) => `${mapType(p.typeName)} ${p.name}`).join(', ');
+
   let body = fn.body.map((s) => compileStmt(s, '    ')).join('\n');
   if (isMain && !body.includes('return ')) {
     body += '\n    return 0;';
   }
-  
+
   return `${cRetType} ${funcName}(${params}) {\n${body}\n}`;
 }
 

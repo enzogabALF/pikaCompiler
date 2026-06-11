@@ -4,6 +4,7 @@ import { parser } from '../compiler/parser';
 import { tokenizePokeCode } from '../compiler/lexer';
 import { typeCheck } from '../compiler/semantics/typeChecker';
 import { compileIRToC } from '../compiler/codegen';
+import { executeProgram } from '../compiler/interpreter';
 
 type Diagnostic = {
   message: string;
@@ -94,12 +95,26 @@ onmessage = (e) => {
     const optimizedIr = optimizeIR(ir);
     const compiledC = compileIRToC(optimizedIr);
 
+    // Ejecutar programa en el intérprete
+    let executionResult = null;
+    try {
+      executionResult = executeProgram(ast);
+    } catch (execErr: any) {
+      executionResult = {
+        entryFunction: '',
+        output: [],
+        returnValue: null,
+        error: execErr?.message || 'Error de ejecución desconocido',
+      };
+    }
+
     postMessage({
       type: 'result',
       ast,
       ir,
       optimizedIr,
       compiledC,
+      executionResult,
     } as any);
   } catch (err: any) {
     postMessage({
