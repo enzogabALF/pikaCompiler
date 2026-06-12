@@ -10,7 +10,7 @@
     "test": "vitest",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "prepare": "cd .. && husky install web/.husky"
+    "prepare": "node -e \"if (!process.env.CI) require('child_process').execSync('husky install web/.husky', { cwd: '..' })\""
   },
   "engines": {
     "node": ">=18"
