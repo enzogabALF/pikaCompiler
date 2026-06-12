@@ -13,7 +13,7 @@
     "prepare": "cd .. && husky install web/.husky"
   },
   "engines": {
-    "node": ">=18 <19"
+    "node": ">=18"
   },
   "dependencies": {
     "react": "18.2.0",
