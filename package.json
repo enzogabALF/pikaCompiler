@@ -13,7 +13,7 @@
     "pika-compile": "ts-node bin/pika-compiler.ts"
   },
   "engines": {
-    "node": ">=18 <19"
+    "node": "24.x"
   },
   "devDependencies": {
     "turbo": "2.9.16",
