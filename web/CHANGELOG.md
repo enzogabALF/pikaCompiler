@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/enzogabALF/pikaCompiler/compare/v1.0.0...v1.0.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* relax Node.js version constraint for Vercel deployment ([d8b1314](https://github.com/enzogabALF/pikaCompiler/commit/d8b131435895b3d38508c46589d2082fcb5489ec))
+
 # 1.0.0 (2026-06-11)
 
 
